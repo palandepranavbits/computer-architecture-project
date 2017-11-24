@@ -18,77 +18,125 @@
 //
 //////////////////////////////////////////////////////////////////////////////////	
 
-module D_ff(input clk, input reset, input regWrite, input decOut1b , input d, output reg q);
-	always @ (negedge clk)
-	begin
-	if(reset==1)
-		q=0;
-	else
-		if(regWrite == 1 && decOut1b==1)
-		begin
-			q=d;
-		end
-	end
-endmodule
+
 
 
 ///////////////////////////////regfile///////////////////////////////////////
 
 
-//author:pranav
-module decoder4to16(input [3:0] destReg, output reg [15:0] decOut);
+module D_ff(input clk, input reset, input regWrite, input regWrite_c , input decOut , input decOut_c ,
+			input d, input d_c, output reg q);
+	always @ (negedge clk)
+	begin
+		if(reset == 1'b1)
+			q = 1'b0;
+		else
+			if(regWrite == 1'b1 && decOut == 1'b1)
+				begin
+					q = d;
+				end
+			if(regWrite_c == 1'b1 && decOut_c == 1'b1)
+				begin
+					q = d_c;
+				end
+			
+	end
+endmodule
+
+
+module decoder5to32(input [4:0] destReg, output reg [31:0] decOut);
 	always@(destReg)
 	begin
 		case(destReg)
-			4'b0000 : decOut = 16'b0000000000000001;
-			4'b0001 : decOut = 16'b0000000000000010;
-			4'b0010 : decOut = 16'b0000000000000100;
-			4'b0011 : decOut = 16'b0000000000001000;
-			4'b0100 : decOut = 16'b0000000000010000;
-			4'b0101 : decOut = 16'b0000000000100000;
-			4'b0110 : decOut = 16'b0000000001000000;
-			4'b0111 : decOut = 16'b0000000010000000;
-			4'b1000 : decOut = 16'b0000000100000000;
-			4'b1001 : decOut = 16'b0000001000000000;
-			4'b1010 : decOut = 16'b0000010000000000;
-			4'b1011 : decOut = 16'b0000100000000000;
-			4'b1100 : decOut = 16'b0001000000000000;
-			4'b1101 : decOut = 16'b0010000000000000;
-			4'b1110 : decOut = 16'b0100000000000000;
-			4'b1111 : decOut = 16'b1000000000000000;			
+			5'd0  : decOut = 32'b00000000000000000000000000000001;			
+			5'd1  : decOut = 32'b00000000000000000000000000000010;			
+			5'd2  : decOut = 32'b00000000000000000000000000000100;			
+			5'd3  : decOut = 32'b00000000000000000000000000001000;			
+			5'd4  : decOut = 32'b00000000000000000000000000010000;			
+			5'd5  : decOut = 32'b00000000000000000000000000100000;			
+			5'd6  : decOut = 32'b00000000000000000000000001000000;			
+			5'd7  : decOut = 32'b00000000000000000000000010000000;		
+			5'd8  : decOut = 32'b00000000000000000000000100000000;			
+			5'd9  : decOut = 32'b00000000000000000000001000000000;			
+			5'd10 : decOut = 32'b00000000000000000000010000000000;			
+			5'd11 : decOut = 32'b00000000000000000000100000000000;			
+			5'd12 : decOut = 32'b00000000000000000001000000000000;			
+			5'd13 : decOut = 32'b00000000000000000010000000000000;			
+			5'd14 : decOut = 32'b00000000000000000100000000000000;			
+			5'd15 : decOut = 32'b00000000000000001000000000000000;	
+			5'd16 : decOut = 32'b00000000000000010000000000000000;			
+			5'd17 : decOut = 32'b00000000000000100000000000000000;			
+			5'd18 : decOut = 32'b00000000000001000000000000000000;			
+			5'd19 : decOut = 32'b00000000000010000000000000000000;			
+			5'd20 : decOut = 32'b00000000000100000000000000000000;			
+			5'd21 : decOut = 32'b00000000001000000000000000000000;			
+			5'd22 : decOut = 32'b00000000010000000000000000000000;			
+			5'd23 : decOut = 32'b00000000100000000000000000000000;	
+			5'd24 : decOut = 32'b00000001000000000000000000000000;			
+			5'd25 : decOut = 32'b00000010000000000000000000000000;			
+			5'd26 : decOut = 32'b00000100000000000000000000000000;			
+			5'd27 : decOut = 32'b00001000000000000000000000000000;			
+			5'd28 : decOut = 32'b00010000000000000000000000000000;			
+			5'd29 : decOut = 32'b00100000000000000000000000000000;			
+			5'd30 : decOut = 32'b01000000000000000000000000000000;			
+			5'd31 : decOut = 32'b10000000000000000000000000000000;		
 		endcase
 	end
+endmodule 
 
-module mux16to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, input [31:0] outR3,
+module mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, input [31:0] outR3,
 	input [31:0] outR4, input [31:0] outR5, input [31:0] outR6, input [31:0] outR7,
 	input [31:0] outR8, input [31:0] outR9, input [31:0] outR10, input [31:0] outR11,
 	input [31:0] outR12, input [31:0] outR13, input [31:0] outR14, input [31:0] outR15,
-	input [3:0] Sel, output reg [31:0] outBus);
+	input [31:0] outR16, input [31:0] outR17, input [31:0] outR18, input [31:0] outR19,
+	input [31:0] outR20, input [31:0] outR21, input [31:0] outR22, input [31:0] outR23,
+	input [31:0] outR24, input [31:0] outR25, input [31:0] outR26, input [31:0] outR27,
+	input [31:0] outR28, input [31:0] outR29, input [31:0] outR30, input [31:0] outR31,
+	input [4:0] Sel, output reg [31:0] outBus);
    
-	always@(*)
+	always@(outR0 or outR1 or outR2 or outR3 or outR4 or outR5 or outR6 or outR7 or outR8 or outR9
+	or outR10 or outR11 or outR12 or outR13 or outR14 or outR15 or outR16 or outR17 or outR18 or outR19
+	or outR20 or outR21 or outR22 or outR23 or outR24 or outR25 or outR26 or outR27 or outR28 or outR29
+	or	outR30 or outR31 or Sel)
 	begin
 		case(Sel)
-			4'b0000 : outBus = outR0;
-			4'b0001 : outBus = outR1;
-			4'b0010 : outBus = outR2;
-			4'b0011 : outBus = outR3;
-			4'b0100 : outBus = outR4;
-			4'b0101 : outBus = outR5;
-			4'b0110 : outBus = outR6;
-			4'b0111 : outBus = outR7;	
-			4'b1000 : outBus = outR8;
-			4'b1001 : outBus = outR9;
-			4'b1010 : outBus = outR10;
-			4'b1011 : outBus = outR11;
-			4'b1100 : outBus = outR12;
-			4'b1101 : outBus = outR13;
-			4'b1110 : outBus = outR14;
-			4'b1111 : outBus = outR15;				
+			5'd0  : outBus = outR0;
+			5'd1  : outBus = outR1;
+			5'd2  : outBus = outR2;
+			5'd3  : outBus = outR3;
+			5'd4  : outBus = outR4;
+			5'd5  : outBus = outR5;
+			5'd6  : outBus = outR6;
+			5'd7  : outBus = outR7;	
+			5'd8  : outBus = outR8;
+			5'd9  : outBus = outR9;
+			5'd10 : outBus = outR10;
+			5'd11 : outBus = outR11;
+			5'd12 : outBus = outR12;
+			5'd13 : outBus = outR13;
+			5'd14 : outBus = outR14;
+			5'd15 : outBus = outR15;
+			5'd16 : outBus = outR16;
+			5'd17 : outBus = outR17;
+			5'd18 : outBus = outR18;
+			5'd19 : outBus = outR19;
+			5'd20 : outBus = outR20;
+			5'd21 : outBus = outR21;
+			5'd22 : outBus = outR22;
+			5'd23 : outBus = outR23;	
+			5'd24 : outBus = outR24;
+			5'd25 : outBus = outR25;
+			5'd26 : outBus = outR26;
+			5'd27 : outBus = outR27;
+			5'd28 : outBus = outR28;
+			5'd29 : outBus = outR29;
+			5'd30 : outBus = outR30;
+			5'd31 : outBus = outR31;	
 		endcase
 	end
 		
 endmodule
-
+/*
 module mux2to1_16bits(input [15:0] in0, input [15:0] in1, input Sel, output reg [15:0] outBus);
 	
 	//Write your code here
@@ -101,7 +149,8 @@ module mux2to1_16bits(input [15:0] in0, input [15:0] in1, input Sel, output reg 
 	end
 	
 endmodule
-
+*/
+/*
 module busOutput(input [31:0] reg_rx, input mode, input rx3, output [31:0] rxOut);
 	
 	//Write your code here
@@ -115,27 +164,162 @@ module busOutput(input [31:0] reg_rx, input mode, input rx3, output [31:0] rxOut
 		//wire [15:0]rxOutconcat1;wire [15:0]rxOutconcat2;
 		mux2to1_16bits(16'b0,reg_rx[31:16], mode, rxOut[31:16]);
 		mux2to1_16bits(16'b0,reg_rx[15:0], lowSelect, rxOut[15:0]);
-		
-		//rxOut[31:16] = rxOutconcat1;
-		//rxOut[15:0] = rxOutconcat2;
-		//rxOut = {rxOutconcat1 , rxOutconcat2}
-		
+			
 	end
 	
 endmodule
-
-module registerFile(input clk, input reset, input regWrite, input mode, input [3:0] rs, input [3:0] rt,input [3:0] rd, 
-input [31:0] writeData, output [31:0] rsOut, output [31:0] rtOut);
+*/
+module register32bit( input clk, input reset, input regWrite, input decOut, input regWrite_c, input decOut_c, 
+	input [31:0] writeData, input [31:0] writeData_c, output  [31:0] outR );
+	
+	/*D_ff(input clk, input reset, input regWrite, input regWrite_c , input decOut , input decOut_c ,
+			input d, input d_c, output reg q);*/
+			
+	D_ff d00_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[0],  writeData_c[0],  outR[0]);
+	D_ff d01_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[1],  writeData_c[1],  outR[1]);
+	D_ff d02_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[2],  writeData_c[2],  outR[2]);
+	D_ff d03_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[3],  writeData_c[3],  outR[3]);
+	D_ff d04_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[4],  writeData_c[4],  outR[4]);
+	D_ff d05_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[5],  writeData_c[5],  outR[5]);
+	D_ff d06_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[6],  writeData_c[6],  outR[6]);
+	D_ff d07_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[7],  writeData_c[7],  outR[7]);
+	D_ff d08_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[8],  writeData_c[8],  outR[8]);
+	D_ff d09_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[9],  writeData_c[9],  outR[9]);
+	D_ff d10_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[10], writeData_c[10], outR[10]);
+	D_ff d11_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[11], writeData_c[11], outR[11]);
+	D_ff d12_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[12], writeData_c[12], outR[12]);
+	D_ff d13_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[13], writeData_c[13], outR[13]);
+	D_ff d14_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[14], writeData_c[14], outR[14]);
+	D_ff d15_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[15], writeData_c[15], outR[15]);
+   D_ff d16_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[16], writeData_c[16], outR[16]);
+	D_ff d17_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[17], writeData_c[17], outR[17]);
+	D_ff d18_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[18], writeData_c[18], outR[18]);
+	D_ff d19_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[19], writeData_c[19], outR[19]);
+	D_ff d20_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[20], writeData_c[20], outR[20]);
+	D_ff d21_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[21], writeData_c[21], outR[21]);
+	D_ff d22_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[22], writeData_c[22], outR[22]);
+	D_ff d23_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[23], writeData_c[23], outR[23]);
+   D_ff d24_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[24], writeData_c[24], outR[24]);
+	D_ff d25_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[25], writeData_c[25], outR[25]);
+	D_ff d26_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[26], writeData_c[26], outR[26]);
+	D_ff d27_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[27], writeData_c[27], outR[27]);
+	D_ff d28_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[28], writeData_c[28], outR[28]);
+	D_ff d29_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[29], writeData_c[29], outR[29]);
+	D_ff d30_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[30], writeData_c[30], outR[30]);
+	D_ff d31_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[31], writeData_c[31], outR[31]);
+	
+endmodule
+ 
+module registerSet( input clk, input reset, input regWrite, input [31:0] decOut, input regWrite_c, input [31:0] decOut_c, 
+	input [31:0] writeData, input [31:0] writeData_c, output [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,
+		outR8,outR9,outR10,outR11,outR12,outR13,outR14,outR15,outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,
+		outR24,outR25,outR26,outR27,outR28,outR29,outR30,outR31);
+		register32bit r00_rf( clk, reset, regWrite, decOut[0],  regWrite_c, decOut_c[0],  writeData, writeData_c, outR0 );
+		register32bit r01_rf( clk, reset, regWrite, decOut[1],  regWrite_c, decOut_c[1],  writeData, writeData_c, outR1 );
+		register32bit r02_rf( clk, reset, regWrite, decOut[2],  regWrite_c, decOut_c[2],  writeData, writeData_c, outR2 );
+		register32bit r03_rf( clk, reset, regWrite, decOut[3],  regWrite_c, decOut_c[3],  writeData, writeData_c, outR3 );
+		register32bit r04_rf( clk, reset, regWrite, decOut[4],  regWrite_c, decOut_c[4],  writeData, writeData_c, outR4 );
+		register32bit r05_rf( clk, reset, regWrite, decOut[5],  regWrite_c, decOut_c[5],  writeData, writeData_c, outR5 );
+		register32bit r06_rf( clk, reset, regWrite, decOut[6],  regWrite_c, decOut_c[6],  writeData, writeData_c, outR6 );
+		register32bit r07_rf( clk, reset, regWrite, decOut[7],  regWrite_c, decOut_c[7],  writeData, writeData_c, outR7 );
+		register32bit r08_rf( clk, reset, regWrite, decOut[8],  regWrite_c, decOut_c[8],  writeData, writeData_c, outR8 );
+		register32bit r09_rf( clk, reset, regWrite, decOut[9],  regWrite_c, decOut_c[9],  writeData, writeData_c, outR9 );
+		register32bit r10_rf( clk, reset, regWrite, decOut[10], regWrite_c, decOut_c[10], writeData, writeData_c, outR10 );
+		register32bit r11_rf( clk, reset, regWrite, decOut[11], regWrite_c, decOut_c[11], writeData, writeData_c, outR11 );
+		register32bit r12_rf( clk, reset, regWrite, decOut[12], regWrite_c, decOut_c[12], writeData, writeData_c, outR12 );
+		register32bit r13_rf( clk, reset, regWrite, decOut[13], regWrite_c, decOut_c[13], writeData, writeData_c, outR13 );
+		register32bit r14_rf( clk, reset, regWrite, decOut[14], regWrite_c, decOut_c[14], writeData, writeData_c, outR14 );
+		register32bit r15_rf( clk, reset, regWrite, decOut[15], regWrite_c, decOut_c[15], writeData, writeData_c, outR15 );
+		register32bit r16_rf( clk, reset, regWrite, decOut[16], regWrite_c, decOut_c[16], writeData, writeData_c, outR16 );
+		register32bit r17_rf( clk, reset, regWrite, decOut[17], regWrite_c, decOut_c[17], writeData, writeData_c, outR17 );
+		register32bit r18_rf( clk, reset, regWrite, decOut[18], regWrite_c, decOut_c[18], writeData, writeData_c, outR18 );
+		register32bit r19_rf( clk, reset, regWrite, decOut[19], regWrite_c, decOut_c[19], writeData, writeData_c, outR19 );
+		register32bit r20_rf( clk, reset, regWrite, decOut[20], regWrite_c, decOut_c[20], writeData, writeData_c, outR20 );
+		register32bit r21_rf( clk, reset, regWrite, decOut[21], regWrite_c, decOut_c[21], writeData, writeData_c, outR21 );
+		register32bit r22_rf( clk, reset, regWrite, decOut[22], regWrite_c, decOut_c[22], writeData, writeData_c, outR22 );
+		register32bit r23_rf( clk, reset, regWrite, decOut[23], regWrite_c, decOut_c[23], writeData, writeData_c, outR23 );
+		register32bit r24_rf( clk, reset, regWrite, decOut[24], regWrite_c, decOut_c[24], writeData, writeData_c, outR24 );
+		register32bit r25_rf( clk, reset, regWrite, decOut[25], regWrite_c, decOut_c[25], writeData, writeData_c, outR25 );
+		register32bit r26_rf( clk, reset, regWrite, decOut[26], regWrite_c, decOut_c[26], writeData, writeData_c, outR26 );
+		register32bit r27_rf( clk, reset, regWrite, decOut[27], regWrite_c, decOut_c[27], writeData, writeData_c, outR27 );
+		register32bit r28_rf( clk, reset, regWrite, decOut[28], regWrite_c, decOut_c[28], writeData, writeData_c, outR28 );
+		register32bit r29_rf( clk, reset, regWrite, decOut[29], regWrite_c, decOut_c[29], writeData, writeData_c, outR29 );
+		register32bit r30_rf( clk, reset, regWrite, decOut[30], regWrite_c, decOut_c[30], writeData, writeData_c, outR30 );
+		register32bit r31_rf( clk, reset, regWrite, decOut[31], regWrite_c, decOut_c[31], writeData, writeData_c, outR31 );
+		
+		
+endmodule
+module registerFile(input clk, input reset, input regWrite, input regWrite_c, input [4:0] rs, input [4:0] rt,
+		input [4:0] rd, input [4:0] rs_c, input [4:0] rt_c, input [4:0] rd_c, input [31:0] writeData, input [31:0] writeData_c,
+		output [31:0] rsOut, output [31:0] rtOut,output [31:0] rsOut_c, output [31:0] rtOut_c);
 	
 	//Write your code here
+	/*mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, input [31:0] outR3,
+	input [31:0] outR4, input [31:0] outR5, input [31:0] outR6, input [31:0] outR7,
+	input [31:0] outR8, input [31:0] outR9, input [31:0] outR10, input [31:0] outR11,
+	input [31:0] outR12, input [31:0] outR13, input [31:0] outR14, input [31:0] outR15,
+	input [31:0] outR16, input [31:0] outR17, input [31:0] outR18, input [31:0] outR19,
+	input [31:0] outR20, input [31:0] outR21, input [31:0] outR22, input [31:0] outR23,
+	input [31:0] outR24, input [31:0] outR25, input [31:0] outR26, input [31:0] outR27,
+	input [31:0] outR28, input [31:0] outR29, input [31:0] outR30, input [31:0] outR31,
+	input [3:0] Sel, output reg [31:0] outBus);*/
+	
+	/*registerSet( input clk, input reset, input regWrite, input [31:0] decOut1, input regWrite_c, input [31:0] decOut, 
+	input [31:0] writeData, input [31:0] writeData_c, output [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,
+		outR8,outR9,outR10,outR11,outR12,outR13,outR14,outR15,outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,
+		outR24,outR25,outR26,outR27,outR28,outR29,outR30,outR31);*/
+		
+	//decoder5to32(input [4:0] destReg, output reg [31:0] decOut);
+	
+	/*mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, input [31:0] outR3,
+	input [31:0] outR4, input [31:0] outR5, input [31:0] outR6, input [31:0] outR7,
+	input [31:0] outR8, input [31:0] outR9, input [31:0] outR10, input [31:0] outR11,
+	input [31:0] outR12, input [31:0] outR13, input [31:0] outR14, input [31:0] outR15,
+	input [31:0] outR16, input [31:0] outR17, input [31:0] outR18, input [31:0] outR19,
+	input [31:0] outR20, input [31:0] outR21, input [31:0] outR22, input [31:0] outR23,
+	input [31:0] outR24, input [31:0] outR25, input [31:0] outR26, input [31:0] outR27,
+	input [31:0] outR28, input [31:0] outR29, input [31:0] outR30, input [31:0] outR31,
+	input [3:0] Sel, output reg [31:0] outBus);*/
+	
+	wire [31:0] decOut,decOut_c;
+	decoder5to32 decoder1_rf(rd, decOut);
+	decoder5to32 decoder2_rf(rd_c, decOut_c);
+	
+	wire [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,outR12,outR13,
+					outR14,outR15,outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,outR24,outR25,outR26,
+					outR27,outR28,outR29,outR30,outR31;
+	registerSet registerSet1_rf(clk,reset, regWrite, decOut, regWrite_c, decOut_c, writeData, writeData_c, 
+									outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,
+									outR12,outR13,outR14,outR15,outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,
+									outR24,outR25,outR26,outR27,outR28,outR29,outR30,outR31);
+	//for rsOut								
+	mux32to1 mux32to1_1_rf(outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,
+	outR12, outR13, outR14, outR15, outR16, outR17, outR18,outR19, outR20, outR21, outR22,outR23,
+	outR24, outR25, outR26,outR27, outR28, outR29, outR30,outR31,
+	rs, rsOut);
+	//for rtOut
+	mux32to1 mux32to1_2_rf(outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,
+	outR12, outR13, outR14, outR15, outR16, outR17, outR18,outR19, outR20, outR21, outR22,outR23,
+	outR24, outR25, outR26,outR27, outR28, outR29, outR30,outR31,
+	rt, rtOut);
+	//for rsOut_c
+	mux32to1 mux32to1_3_rf(outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,
+	outR12, outR13, outR14, outR15, outR16, outR17, outR18,outR19, outR20, outR21, outR22,outR23,
+	outR24, outR25, outR26,outR27, outR28, outR29, outR30,outR31,
+	rs_c, rsOut_c);
+   //for rtOut_c
+	mux32to1 mux32to1_4_rf(outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,
+	outR12, outR13, outR14, outR15, outR16, outR17, outR18,outR19, outR20, outR21, outR22,outR23,
+	outR24, outR25, outR26,outR27, outR28, outR29, outR30,outR31,
+	rt_c, rtOut_c);	
 	
 endmodule
 
 //////////////////////////////////////endofregfile////////////////////////////////////////
 
 
-module main(
-    );
-
+module main( input x, output reg y);
+	always@(x)
+		y=x;
 
 endmodule
