@@ -1,22 +1,22 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Engineer: Pranav Palande
-// 
-// Create Date:    13:59:08 11/22/2017 
+//
+// Create Date:    13:59:08 11/22/2017
 // Design Name: 	VLIW architecture design
-// Module Name:    main 
+// Module Name:    main
 // Project Name:  Computer Architecture Project
-// Target Devices: 
-// Tool versions: 
-// Description: 
+// Target Devices:
+// Tool versions:
+// Description:
 //
-// Dependencies: 
+// Dependencies:
 //
-// Revision: 
+// Revision:
 // Revision 0.01 - File Created
-// Additional Comments: 
+// Additional Comments:
 //
-//////////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -39,7 +39,7 @@ module D_ff(input clk, input reset, input regWrite, input regWrite_c , input dec
 				begin
 					q = d_c;
 				end
-			
+
 	end
 endmodule
 
@@ -48,41 +48,41 @@ module decoder5to32(input [4:0] destReg, output reg [31:0] decOut);
 	always@(destReg)
 	begin
 		case(destReg)
-			5'd0  : decOut = 32'b00000000000000000000000000000001;			
-			5'd1  : decOut = 32'b00000000000000000000000000000010;			
-			5'd2  : decOut = 32'b00000000000000000000000000000100;			
-			5'd3  : decOut = 32'b00000000000000000000000000001000;			
-			5'd4  : decOut = 32'b00000000000000000000000000010000;			
-			5'd5  : decOut = 32'b00000000000000000000000000100000;			
-			5'd6  : decOut = 32'b00000000000000000000000001000000;			
-			5'd7  : decOut = 32'b00000000000000000000000010000000;		
-			5'd8  : decOut = 32'b00000000000000000000000100000000;			
-			5'd9  : decOut = 32'b00000000000000000000001000000000;			
-			5'd10 : decOut = 32'b00000000000000000000010000000000;			
-			5'd11 : decOut = 32'b00000000000000000000100000000000;			
-			5'd12 : decOut = 32'b00000000000000000001000000000000;			
-			5'd13 : decOut = 32'b00000000000000000010000000000000;			
-			5'd14 : decOut = 32'b00000000000000000100000000000000;			
-			5'd15 : decOut = 32'b00000000000000001000000000000000;	
-			5'd16 : decOut = 32'b00000000000000010000000000000000;			
-			5'd17 : decOut = 32'b00000000000000100000000000000000;			
-			5'd18 : decOut = 32'b00000000000001000000000000000000;			
-			5'd19 : decOut = 32'b00000000000010000000000000000000;			
-			5'd20 : decOut = 32'b00000000000100000000000000000000;			
-			5'd21 : decOut = 32'b00000000001000000000000000000000;			
-			5'd22 : decOut = 32'b00000000010000000000000000000000;			
-			5'd23 : decOut = 32'b00000000100000000000000000000000;	
-			5'd24 : decOut = 32'b00000001000000000000000000000000;			
-			5'd25 : decOut = 32'b00000010000000000000000000000000;			
-			5'd26 : decOut = 32'b00000100000000000000000000000000;			
-			5'd27 : decOut = 32'b00001000000000000000000000000000;			
-			5'd28 : decOut = 32'b00010000000000000000000000000000;			
-			5'd29 : decOut = 32'b00100000000000000000000000000000;			
-			5'd30 : decOut = 32'b01000000000000000000000000000000;			
-			5'd31 : decOut = 32'b10000000000000000000000000000000;		
+			5'd0  : decOut = 32'b00000000000000000000000000000001;
+			5'd1  : decOut = 32'b00000000000000000000000000000010;
+			5'd2  : decOut = 32'b00000000000000000000000000000100;
+			5'd3  : decOut = 32'b00000000000000000000000000001000;
+			5'd4  : decOut = 32'b00000000000000000000000000010000;
+			5'd5  : decOut = 32'b00000000000000000000000000100000;
+			5'd6  : decOut = 32'b00000000000000000000000001000000;
+			5'd7  : decOut = 32'b00000000000000000000000010000000;
+			5'd8  : decOut = 32'b00000000000000000000000100000000;
+			5'd9  : decOut = 32'b00000000000000000000001000000000;
+			5'd10 : decOut = 32'b00000000000000000000010000000000;
+			5'd11 : decOut = 32'b00000000000000000000100000000000;
+			5'd12 : decOut = 32'b00000000000000000001000000000000;
+			5'd13 : decOut = 32'b00000000000000000010000000000000;
+			5'd14 : decOut = 32'b00000000000000000100000000000000;
+			5'd15 : decOut = 32'b00000000000000001000000000000000;
+			5'd16 : decOut = 32'b00000000000000010000000000000000;
+			5'd17 : decOut = 32'b00000000000000100000000000000000;
+			5'd18 : decOut = 32'b00000000000001000000000000000000;
+			5'd19 : decOut = 32'b00000000000010000000000000000000;
+			5'd20 : decOut = 32'b00000000000100000000000000000000;
+			5'd21 : decOut = 32'b00000000001000000000000000000000;
+			5'd22 : decOut = 32'b00000000010000000000000000000000;
+			5'd23 : decOut = 32'b00000000100000000000000000000000;
+			5'd24 : decOut = 32'b00000001000000000000000000000000;
+			5'd25 : decOut = 32'b00000010000000000000000000000000;
+			5'd26 : decOut = 32'b00000100000000000000000000000000;
+			5'd27 : decOut = 32'b00001000000000000000000000000000;
+			5'd28 : decOut = 32'b00010000000000000000000000000000;
+			5'd29 : decOut = 32'b00100000000000000000000000000000;
+			5'd30 : decOut = 32'b01000000000000000000000000000000;
+			5'd31 : decOut = 32'b10000000000000000000000000000000;
 		endcase
 	end
-endmodule 
+endmodule
 
 module mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, input [31:0] outR3,
 	input [31:0] outR4, input [31:0] outR5, input [31:0] outR6, input [31:0] outR7,
@@ -93,7 +93,7 @@ module mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, inpu
 	input [31:0] outR24, input [31:0] outR25, input [31:0] outR26, input [31:0] outR27,
 	input [31:0] outR28, input [31:0] outR29, input [31:0] outR30, input [31:0] outR31,
 	input [4:0] Sel, output reg [31:0] outBus);
-   
+
 	always@(outR0 or outR1 or outR2 or outR3 or outR4 or outR5 or outR6 or outR7 or outR8 or outR9
 	or outR10 or outR11 or outR12 or outR13 or outR14 or outR15 or outR16 or outR17 or outR18 or outR19
 	or outR20 or outR21 or outR22 or outR23 or outR24 or outR25 or outR26 or outR27 or outR28 or outR29
@@ -107,7 +107,7 @@ module mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, inpu
 			5'd4  : outBus = outR4;
 			5'd5  : outBus = outR5;
 			5'd6  : outBus = outR6;
-			5'd7  : outBus = outR7;	
+			5'd7  : outBus = outR7;
 			5'd8  : outBus = outR8;
 			5'd9  : outBus = outR9;
 			5'd10 : outBus = outR10;
@@ -123,7 +123,7 @@ module mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, inpu
 			5'd20 : outBus = outR20;
 			5'd21 : outBus = outR21;
 			5'd22 : outBus = outR22;
-			5'd23 : outBus = outR23;	
+			5'd23 : outBus = outR23;
 			5'd24 : outBus = outR24;
 			5'd25 : outBus = outR25;
 			5'd26 : outBus = outR26;
@@ -131,14 +131,14 @@ module mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, inpu
 			5'd28 : outBus = outR28;
 			5'd29 : outBus = outR29;
 			5'd30 : outBus = outR30;
-			5'd31 : outBus = outR31;	
+			5'd31 : outBus = outR31;
 		endcase
 	end
-		
+
 endmodule
 /*
 module mux2to1_16bits(input [15:0] in0, input [15:0] in1, input Sel, output reg [15:0] outBus);
-	
+
 	//Write your code here
 	always@(in0,in1,Sel)
 	begin
@@ -147,34 +147,34 @@ module mux2to1_16bits(input [15:0] in0, input [15:0] in1, input Sel, output reg 
 			2'b01 : outBus = in1;
 		endcase
 	end
-	
+
 endmodule
 */
 /*
 module busOutput(input [31:0] reg_rx, input mode, input rx3, output [31:0] rxOut);
-	
+
 	//Write your code here
-	
+
 	begin
 		wire notrx3;
 		not(notrx3,rx3);
 		wire lowSelect;
 		or(lowSelect,notrx3,mode);
-		
+
 		//wire [15:0]rxOutconcat1;wire [15:0]rxOutconcat2;
 		mux2to1_16bits(16'b0,reg_rx[31:16], mode, rxOut[31:16]);
 		mux2to1_16bits(16'b0,reg_rx[15:0], lowSelect, rxOut[15:0]);
-			
+
 	end
-	
+
 endmodule
 */
-module register32bit( input clk, input reset, input regWrite, input decOut, input regWrite_c, input decOut_c, 
+module register32bit( input clk, input reset, input regWrite, input decOut, input regWrite_c, input decOut_c,
 	input [31:0] writeData, input [31:0] writeData_c, output  [31:0] outR );
-	
+
 	/*D_ff(input clk, input reset, input regWrite, input regWrite_c , input decOut , input decOut_c ,
 			input d, input d_c, output reg q);*/
-			
+
 	D_ff d00_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[0],  writeData_c[0],  outR[0]);
 	D_ff d01_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[1],  writeData_c[1],  outR[1]);
 	D_ff d02_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[2],  writeData_c[2],  outR[2]);
@@ -207,10 +207,10 @@ module register32bit( input clk, input reset, input regWrite, input decOut, inpu
 	D_ff d29_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[29], writeData_c[29], outR[29]);
 	D_ff d30_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[30], writeData_c[30], outR[30]);
 	D_ff d31_rf(clk, reset, regWrite, regWrite_c, decOut, decOut_c, writeData[31], writeData_c[31], outR[31]);
-	
+
 endmodule
- 
-module registerSet( input clk, input reset, input regWrite, input [31:0] decOut, input regWrite_c, input [31:0] decOut_c, 
+
+module registerSet( input clk, input reset, input regWrite, input [31:0] decOut, input regWrite_c, input [31:0] decOut_c,
 	input [31:0] writeData, input [31:0] writeData_c, output [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,
 		outR8,outR9,outR10,outR11,outR12,outR13,outR14,outR15,outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,
 		outR24,outR25,outR26,outR27,outR28,outR29,outR30,outR31);
@@ -246,13 +246,13 @@ module registerSet( input clk, input reset, input regWrite, input [31:0] decOut,
 		register32bit r29_rf( clk, reset, regWrite, decOut[29], regWrite_c, decOut_c[29], writeData, writeData_c, outR29 );
 		register32bit r30_rf( clk, reset, regWrite, decOut[30], regWrite_c, decOut_c[30], writeData, writeData_c, outR30 );
 		register32bit r31_rf( clk, reset, regWrite, decOut[31], regWrite_c, decOut_c[31], writeData, writeData_c, outR31 );
-		
-		
+
+
 endmodule
 module registerFile(input clk, input reset, input regWrite, input regWrite_c, input [4:0] rs, input [4:0] rt,
 		input [4:0] rd, input [4:0] rs_c, input [4:0] rt_c, input [4:0] rd_c, input [31:0] writeData, input [31:0] writeData_c,
 		output [31:0] rsOut, output [31:0] rtOut,output [31:0] rsOut_c, output [31:0] rtOut_c);
-	
+
 	//Write your code here
 	/*mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, input [31:0] outR3,
 	input [31:0] outR4, input [31:0] outR5, input [31:0] outR6, input [31:0] outR7,
@@ -263,14 +263,14 @@ module registerFile(input clk, input reset, input regWrite, input regWrite_c, in
 	input [31:0] outR24, input [31:0] outR25, input [31:0] outR26, input [31:0] outR27,
 	input [31:0] outR28, input [31:0] outR29, input [31:0] outR30, input [31:0] outR31,
 	input [3:0] Sel, output reg [31:0] outBus);*/
-	
-	/*registerSet( input clk, input reset, input regWrite, input [31:0] decOut1, input regWrite_c, input [31:0] decOut, 
+
+	/*registerSet( input clk, input reset, input regWrite, input [31:0] decOut1, input regWrite_c, input [31:0] decOut,
 	input [31:0] writeData, input [31:0] writeData_c, output [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,
 		outR8,outR9,outR10,outR11,outR12,outR13,outR14,outR15,outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,
 		outR24,outR25,outR26,outR27,outR28,outR29,outR30,outR31);*/
-		
+
 	//decoder5to32(input [4:0] destReg, output reg [31:0] decOut);
-	
+
 	/*mux32to1(input [31:0] outR0, input [31:0] outR1, input [31:0] outR2, input [31:0] outR3,
 	input [31:0] outR4, input [31:0] outR5, input [31:0] outR6, input [31:0] outR7,
 	input [31:0] outR8, input [31:0] outR9, input [31:0] outR10, input [31:0] outR11,
@@ -280,19 +280,19 @@ module registerFile(input clk, input reset, input regWrite, input regWrite_c, in
 	input [31:0] outR24, input [31:0] outR25, input [31:0] outR26, input [31:0] outR27,
 	input [31:0] outR28, input [31:0] outR29, input [31:0] outR30, input [31:0] outR31,
 	input [3:0] Sel, output reg [31:0] outBus);*/
-	
+
 	wire [31:0] decOut,decOut_c;
 	decoder5to32 decoder1_rf(rd, decOut);
 	decoder5to32 decoder2_rf(rd_c, decOut_c);
-	
+
 	wire [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,outR12,outR13,
 					outR14,outR15,outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,outR24,outR25,outR26,
 					outR27,outR28,outR29,outR30,outR31;
-	registerSet registerSet1_rf(clk,reset, regWrite, decOut, regWrite_c, decOut_c, writeData, writeData_c, 
+	registerSet registerSet1_rf(clk,reset, regWrite, decOut, regWrite_c, decOut_c, writeData, writeData_c,
 									outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,
 									outR12,outR13,outR14,outR15,outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,
 									outR24,outR25,outR26,outR27,outR28,outR29,outR30,outR31);
-	//for rsOut								
+	//for rsOut
 	mux32to1 mux32to1_1_rf(outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,
 	outR12, outR13, outR14, outR15, outR16, outR17, outR18,outR19, outR20, outR21, outR22,outR23,
 	outR24, outR25, outR26,outR27, outR28, outR29, outR30,outR31,
@@ -311,12 +311,140 @@ module registerFile(input clk, input reset, input regWrite, input regWrite_c, in
 	mux32to1 mux32to1_4_rf(outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,
 	outR12, outR13, outR14, outR15, outR16, outR17, outR18,outR19, outR20, outR21, outR22,outR23,
 	outR24, outR25, outR26,outR27, outR28, outR29, outR30,outR31,
-	rt_c, rtOut_c);	
-	
+	rt_c, rtOut_c);
+
 endmodule
 
-//////////////////////////////////////endofregfile////////////////////////////////////////
+//////////////////////////////////////end_of_regfile////////////////////////////////////////
 
+/////////////////////////////////////id_pipeline//////////////////////////////////////////
+
+module ctrlckt(input [6:0] opcode, input [2:0] fun3,output reg [1:0]alusrcB, output reg [1:0]aluOp, output reg memRd,
+ output reg memWr, output reg regData,output reg branch, output reg regWrite, output reg jumpR);
+					
+	always@(opcode or fun3)
+		begin
+			//srai
+			if(opcode == 7'b0010011 && fun3 == 3'b101)
+				begin
+					alusrcB = 2'd1;
+					aluOp = 2'd2;
+					memRd = 1'b0;
+					memWr = 1'b0;
+					regData = 1'b0;
+					regWrite = 1'b1;
+					branch = 1'b0;
+					jumpR = 1'b0;
+				end
+			//add	
+			else if(opcode == 7'b0110011)
+				begin
+					alusrcB = 2'd0;
+					aluOp = 2'd0;
+					memRd = 1'b0;
+					memWr = 1'b0;
+					regData = 1'b0;
+					regWrite = 1'b1;
+					branch = 1'b0;
+					jumpR = 1'b0;
+				end
+			//jalr	
+			else if(opcode == 7'b1100111)
+				begin
+					alusrcB = 2'd2;
+					aluOp = 2'd0;
+					memRd = 1'b0;
+					memWr = 1'b0;
+					regData = 1'b1;
+					regWrite = 1'b1;
+					branch = 1'b0;
+					jumpR = 1'b1;
+				end
+			//andi	
+			else if(opcode == 7'b0010011 && fun3 == 3'b110)
+				begin
+					alusrcB = 2'd2;
+					aluOp = 2'd1;
+					memRd = 1'b0;
+					memWr = 1'b0;
+					regData = 1'b0;
+					regWrite = 1'b1;
+					branch = 1'b0;
+					jumpR = 1'b0;
+				end
+			//sh	
+			else if(opcode == 7'b0100011)
+				begin
+					alusrcB = 2'd2;
+					aluOp = 2'd0;
+					memRd = 1'b0;
+					memWr = 1'b1;
+					regData = 1'b0;
+					regWrite = 1'b1;
+					branch = 1'b0;
+					jumpR = 1'b0;
+				end
+			//bge	
+			else if(opcode == 7'b1100011)
+				begin
+					alusrcB = 2'bxx;
+					aluOp = 2'bxx;
+					memRd = 1'b0;
+					memWr = 1'b0;
+					regData = 1'bx;
+					regWrite = 1'b0;
+					branch = 1'b1;
+					jumpR = 1'b0;
+				end
+			
+		end	
+					
+endmodule					
+
+module ctrlckt_c(input [1:0] opcode_c, output reg memRd_c,  output reg memWr_c, output reg [1:0] regData, 
+output reg regWrite, output reg branch, output reg jumpR);
+	always@(opcode_c)
+		begin
+			case(opcode_c)
+				
+					2'b10: 
+						begin
+							memRd_c = 0;
+							memWr_c = 0;
+							regData = 2'b00;
+							regWrite = 1;
+							branch = 0;
+							jumpR = 0;
+						end	
+					2'b01: 
+						begin
+							memRd_c = 0;
+							memWr_c = 0;
+							regData = 2'b10;
+							regWrite = 1;
+							branch = 0;
+							jumpR = 0;
+						end	
+					2'b00: 
+						begin
+							memRd_c = 1;
+							memWr_c = 0;
+							regData = 2'b01;
+							regWrite = 1;
+							branch = 0;
+							jumpR = 0;
+						end		
+				
+			endcase
+		end
+endmodule
+/////////////////////////////////////end of id_pipeline///////////////////////////////////
+
+
+/////////////////////////////////////ex_pipeline//////////////////////////////////////////
+
+
+/////////////////////////////////////end of ex_pipeline///////////////////////////////////
 
 module main( input x, output reg y);
 	always@(x)
