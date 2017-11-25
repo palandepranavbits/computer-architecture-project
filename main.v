@@ -485,15 +485,15 @@ endmodule
 module ex_pipeline(input  [1:0] alusrcB,input  [1:0] aluOp,input  memRd,input  memWr,input  regData,
 		input  branch,input regWrite,input  jumpR,input  memRd_c, input  memWr_c,
 		input  [1:0] regData_c,	input  regWrite_c, input  [31:0] reg_rs, input  [31:0] reg_rt,
-		input  [31:0] reg_rs_c,input  [31:0] reg_rd, input  [31:0] reg_rd_c, 
+		input  [31:0] reg_rs_c,input  [4:0] rd, input  [4:0] rd_c, 
 		input  [31:0] reg_rt_c, input  [31:0] concat_val,input  [31:0] zeroext5to32, input  [31:0]signext5to32,
 		input  [31:0] signext12to32,
-		input  [31:0] pcplus4,input  [31:0] rd, input  [31:0] rd_c, input [31:0] DataOut_ex_mem, 
+		input  [31:0] pcplus4, input [31:0] DataOut_ex_mem, 
 		input [31:0] regDataOut_c_ex_mem, input [31:0] aluOut_jalr_ex_mem,input  [31:0] sext5to32_c,
 		input [31:0] wire_rd_ex_mem, input [31:0] wire_rd_c_ex_mem,
 		output reg [31:0] wire_rd_id_ex, output reg[31:0] wire_rd_c_id_ex,
-		output reg [31:0] sext5to32_c_ex_mem,output reg [31:0] reg_rd_c_ex_mem,
-		output reg [31:0] reg_rd_ex_mem, output aluOut_jalr_id_ex, output reg memRd_ex_mem, 
+		output reg [31:0] sext5to32_c_ex_mem,output reg [4:0] rd_c_ex_mem,
+		output reg [4:0] rd_ex_mem, output aluOut_jalr_id_ex, output reg memRd_ex_mem, 
 		output reg memWr_ex_mem, output reg regData_ex_mem,output reg branch_ex_mem,output reg regWrite_ex_mem,
 		output reg jumpR_ex_mem,output reg memRd_c_ex_mem, output reg memWr_c_ex_mem,
 		output reg [1:0] regData_c_ex_mem, output reg regWrite_c_ex_mem, output reg [31:0] aluOut_ex_mem,
@@ -513,25 +513,26 @@ output reg regWrite_c, output reg branch, output reg jumpR);*/
 	alu_c alu_c1(reg_rs_c,concat_val,aluOut_ex_mem);
 	
 	//Propogating parameters remaining same across the pipeline
+	//TODO replace * with sensitivity list
 	always@(*)
-	begin
-	memRd_ex_mem = memRd;
-	memWr_ex_mem = memWr;
-	memRd_c_ex_mem = memRd_c;
-	memWr_c_ex_mem = memWr_c;
-	branch_ex_mem = branch;
-	pcplus4_ex_mem = pcplus4;
-	regWrite_ex_mem = regWrite;
-	regWrite_c_ex_mem = regWrite_c;
-	reg_rd_ex_mem = reg_rd;
-	reg_rd_c_ex_mem = reg_rd_c;
-	reg_rt_c_ex_mem = reg_rt_c;
-	sext5to32_c_ex_mem = sext5to32_c;
-	regDataOut_id_ex = regDataOut_ex_mem;
-	regDataOut_c_id_ex = regDataOut_c_ex_mem;
-	wire_rd_id_ex = wire_rd_ex_mem;
-	wire_rd_c_id_ex = wire_rd_c_ex_mem;
-	end
+		begin
+			memRd_ex_mem = memRd;
+			memWr_ex_mem = memWr;
+			memRd_c_ex_mem = memRd_c;
+			memWr_c_ex_mem = memWr_c;
+			branch_ex_mem = branch;
+			pcplus4_ex_mem = pcplus4;
+			regWrite_ex_mem = regWrite;
+			regWrite_c_ex_mem = regWrite_c;
+			rd_ex_mem = rd;
+			rd_c_ex_mem = rd_c;
+			reg_rt_c_ex_mem = reg_rt_c;
+			sext5to32_c_ex_mem = sext5to32_c;
+			regDataOut_id_ex = regDataOut_ex_mem;
+			regDataOut_c_id_ex = regDataOut_c_ex_mem;
+			wire_rd_id_ex = wire_rd_ex_mem;
+			wire_rd_c_id_ex = wire_rd_c_ex_mem;
+		end
 	
 	
 	
@@ -543,6 +544,41 @@ endmodule
 
 /////////////////////////////////////end of ex_pipeline///////////////////////////////////
 
+
+/////////////////////////////////////mem_pipeline///////////////////////////////////
+
+module mem_pipeline(input regWrite, input regWrite_c,input  memRd,input  memWr, input  memRd_c, input  memWr_c, 
+						  input  [1:0] regData_c, input  [4:0] rd, input  [4:0] rd_c, input [31:0] sext5to32_c_ex_mem,
+						  input  [31:0] reg_rt_c,input [31:0] aluOut_ex_mem, input [31:0] aluOut_c_ex_mem, 
+						  input [31:0] pcplus4_ex_mem, output reg regWrite_mem_id,output reg regWrite_c_mem_id,
+						  output [31:0] pcplus4_mem_if,
+						  output reg [31:0] aluOut_c_mem_id, output reg [31:0] aluOut_mem_id, output reg [31:0] dmOut,
+						  output reg [31:0] reg_rt_mem_mux, output [1:0] regData_c_mem_mux, output reg [4:0] rd_mem_mux,
+						  output reg [4:0] rd_c_mem_mux, output reg [31:0] sext5to32_c_ex_mem,output reg [31:0] reg_rt_c_mem_mux);
+			
+			//TODO insert cache
+			
+			//Cache does some magic
+			
+			//TODO remove * with sensitivity list			  
+				always@(*)
+					begin
+						reg_rt_c_mem_mux = reg_rt_c;
+						rd_c_mem_mux = rd_c;
+						rd_mem_mux = rd;
+						sext5to32_c_ex_mem = sext5to32_c_ex_mem;
+						aluOut_c_mem_id = aluOut_c_mem_id;
+						aluOut_mem_id = aluOut_mem_id;
+						pcplus4_mem_if = pcplus4_ex_mem;
+						regWrite_c_mem_id = regWrite_c;
+						regWrite_mem_id = regWrite;
+						regData_c_mem_mux = regData_c;
+						
+					end
+						  
+endmodule
+
+/////////////////////////////////////end of mem_pipeline///////////////////////////////////
 module main( input x, output reg y);
 	always@(x)
 		y=x;
