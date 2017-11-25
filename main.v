@@ -401,36 +401,38 @@ module ctrlckt(input [6:0] opcode, input [2:0] fun3,output reg [1:0]alusrcB, out
 					
 endmodule					
 
-module ctrlckt_c(input [1:0] opcode_c, output reg memRd_c,  output reg memWr_c, output reg [1:0] regData, 
-output reg regWrite, output reg branch, output reg jumpR);
+module ctrlckt_c(input [1:0] opcode_c, output reg memRd_c,  output reg memWr_c, output reg [1:0] regData_c, 
+output reg regWrite_c, output reg branch, output reg jumpR);
 	always@(opcode_c)
 		begin
 			case(opcode_c)
-				
+					//c.mv
 					2'b10: 
 						begin
 							memRd_c = 0;
 							memWr_c = 0;
-							regData = 2'b00;
-							regWrite = 1;
+							regData_c = 2'b00;
+							regWrite_c = 1;
 							branch = 0;
 							jumpR = 0;
 						end	
+					//c.li	
 					2'b01: 
 						begin
 							memRd_c = 0;
 							memWr_c = 0;
-							regData = 2'b10;
-							regWrite = 1;
+							regData_c = 2'b10;
+							regWrite_c = 1;
 							branch = 0;
 							jumpR = 0;
-						end	
+						end
+					//c.lw			
 					2'b00: 
 						begin
 							memRd_c = 1;
 							memWr_c = 0;
-							regData = 2'b01;
-							regWrite = 1;
+							regData_c = 2'b01;
+							regWrite_c = 1;
 							branch = 0;
 							jumpR = 0;
 						end		
@@ -440,8 +442,103 @@ output reg regWrite, output reg branch, output reg jumpR);
 endmodule
 /////////////////////////////////////end of id_pipeline///////////////////////////////////
 
-
 /////////////////////////////////////ex_pipeline//////////////////////////////////////////
+
+
+module alu(input [31:0] aluIn1, input [31:0] aluIn2, input [1:0] aluOp, output reg [31:0] aluOut);
+	always@(aluIn1 or aluIn2 or aluOp)
+		begin
+			case(aluOp)
+				//addition
+				2'b00: aluOut = aluIn1 + aluIn2;
+				//anding
+				2'b01: aluOut = aluIn1 & aluIn2;
+				//shift right
+				2'b10: aluOut = aluIn1 >>> aluIn2;
+				
+			endcase
+		end
+endmodule
+
+
+module alu_c(input [31:0] aluIn1, input [31:0] aluIn2, output reg [31:0] aluOut);
+	always@(aluIn1 or aluIn2)
+		begin
+			aluOut = aluIn1 + aluIn2;
+		end
+endmodule
+
+module mux4to1_32bit(input [31:0] reg_rs, input [31:0] signext5to32, input [31:0] zeroext12to32, input [1:0] alusrcB,
+	output reg [31:0] muxOut);
+	always@(reg_rs or signext5to32 or zeroext12to32 or alusrcB)
+		begin
+			case(alusrcB)
+				2'b00: muxOut = reg_rs;
+				2'b01: muxOut = zeroext12to32;
+				2'b10: muxOut = signext5to32;
+				2'b11: muxOut = 32'b0;
+			endcase
+		end	
+endmodule
+
+//TODO wires going backward are being treated as registers
+module ex_pipeline(input  [1:0] alusrcB,input  [1:0] aluOp,input  memRd,input  memWr,input  regData,
+		input  branch,input regWrite,input  jumpR,input  memRd_c, input  memWr_c,
+		input  [1:0] regData_c,	input  regWrite_c, input  [31:0] reg_rs, input  [31:0] reg_rt,
+		input  [31:0] reg_rs_c,input  [31:0] reg_rd, input  [31:0] reg_rd_c, 
+		input  [31:0] reg_rt_c, input  [31:0] concat_val,input  [31:0] zeroext5to32, input  [31:0]signext5to32,
+		input  [31:0] signext12to32,
+		input  [31:0] pcplus4,input  [31:0] rd, input  [31:0] rd_c, input [31:0] DataOut_ex_mem, 
+		input [31:0] regDataOut_c_ex_mem, input [31:0] aluOut_jalr_ex_mem,input  [31:0] sext5to32_c,
+		input [31:0] wire_rd_ex_mem, input [31:0] wire_rd_c_ex_mem,
+		output reg [31:0] wire_rd_id_ex, output reg[31:0] wire_rd_c_id_ex,
+		output reg [31:0] sext5to32_c_ex_mem,output reg [31:0] reg_rd_c_ex_mem,
+		output reg [31:0] reg_rd_ex_mem, output aluOut_jalr_id_ex, output reg memRd_ex_mem, 
+		output reg memWr_ex_mem, output reg regData_ex_mem,output reg branch_ex_mem,output reg regWrite_ex_mem,
+		output reg jumpR_ex_mem,output reg memRd_c_ex_mem, output reg memWr_c_ex_mem,
+		output reg [1:0] regData_c_ex_mem, output reg regWrite_c_ex_mem, output reg [31:0] aluOut_ex_mem,
+		output reg [31:0] aluOut_c_ex_mem, output reg [31:0] pcplus4_ex_mem, output reg [31:0] regDataOut_id_ex,
+		output reg [31:0] regDataOut_c_id_ex ,output reg [31:0] reg_rt_c_ex_mem,output reg [31:0]  regDataOut_ex_mem
+		);
+/*ctrlckt(input [6:0] opcode, input [2:0] fun3,output reg [1:0]alusrcB, output reg [1:0]aluOp, output reg memRd,
+ output reg memWr, output reg regData,output reg branch, output reg regWrite, output reg jumpR);*/
+ /*ctrlckt_c(input [1:0] opcode_c, output reg memRd_c,  output reg memWr_c, output reg [1:0] regData_c, 
+output reg regWrite_c, output reg branch, output reg jumpR);*/
+	wire [31:0] muxOut;
+	//calling alusrcB mux
+	mux4to1_32bit mux4to1_32bit_alusrcB(_rt,signext5to32,zeroext12to32,alusrcB, muxOut);
+	//calling main alu
+	alu alu1(reg_rs,muxOut,aluOp,aluOut_ex_mem);
+	//calling main alu_c
+	alu_c alu_c1(reg_rs_c,concat_val,aluOut_ex_mem);
+	
+	//Propogating parameters remaining same across the pipeline
+	always@(*)
+	begin
+	memRd_ex_mem = memRd;
+	memWr_ex_mem = memWr;
+	memRd_c_ex_mem = memRd_c;
+	memWr_c_ex_mem = memWr_c;
+	branch_ex_mem = branch;
+	pcplus4_ex_mem = pcplus4;
+	regWrite_ex_mem = regWrite;
+	regWrite_c_ex_mem = regWrite_c;
+	reg_rd_ex_mem = reg_rd;
+	reg_rd_c_ex_mem = reg_rd_c;
+	reg_rt_c_ex_mem = reg_rt_c;
+	sext5to32_c_ex_mem = sext5to32_c;
+	regDataOut_id_ex = regDataOut_ex_mem;
+	regDataOut_c_id_ex = regDataOut_c_ex_mem;
+	wire_rd_id_ex = wire_rd_ex_mem;
+	wire_rd_c_id_ex = wire_rd_c_ex_mem;
+	end
+	
+	
+	
+	
+	
+
+endmodule
 
 
 /////////////////////////////////////end of ex_pipeline///////////////////////////////////
