@@ -125,7 +125,7 @@ module IM(input clk, input reset, input[4:0] PC_Sel, output[63:0] IR);
 	register_IM reg22(clk, reset, 32'b1_111100_00110_00010_101_0000_1_1100011, Qout22); // bge $2 $6 111111000000 
 	register_IM reg23(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout23);
 	register_IM reg24(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout24);
-	register_IM reg25(clk, reset, 32'h0000_0000, Qout25);
+	register_IM reg25(clk, reset, 32'b0000_0000_0000_0000_010_010_011_11_110_00, Qout25); //C.LW $6 $3 10101
 	register_IM reg26(clk, reset, 32'h0000_0000, Qout26);
 	register_IM reg27(clk, reset, 32'h0000_0000, Qout27);
 	register_IM reg28(clk, reset, 32'h0000_0000, Qout28);
