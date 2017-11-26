@@ -1,4 +1,3 @@
-`timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 // Engineer: Pranav Palande
 //
@@ -493,11 +492,10 @@ module id_pipeline(input clk, input reset, input [31:0] pcplus4_if_id, input [31
 						 output reg [31:0] reg_rt_c_id_ex,
 						 output reg [31:0] concat_val, output reg [31:0] zeroext5to32_id_ex, output reg [31:0] signext5to32_id_ex,
 						 output reg [31:0] signext12to32_id_ex, output reg [4:0] rd_id_ex, output reg [4:0] rd_c_id_ex,
-						 output reg branch, output reg jumpR, output reg [31:0] pcplus4_id_ex, output reg [31:0] sign12to32_sh);
+						 output reg branch, output reg jumpR, output reg [31:0] pcplus4_id_ex, output reg [31:0] sign12to32_sh,
+						 output reg [4:0] rs_c_zeroext3to5_id_ex, output  reg mux2to1_5bits_signal_id_ex);
 						 
-			/*registerFile(input clk, input reset, input regWrite, input regWrite_c, input [4:0] rs, input [4:0] rt,
-		input [4:0] rd, input [4:0] rs_c, input [4:0] rt_c, input [4:0] rd_c, input [31:0] writeData, input [31:0] writeData_c,
-		output [31:0] rsOut, output [31:0] rtOut,output [31:0] rsOut_c, output [31:0] rtOut_c);*/
+			
 		/*ctrlckt(input [6:0] opcode, input [2:0] fun3,output reg [1:0]alusrcB, output reg [1:0]aluOp, output reg memRd,
  output reg memWr, output reg regData,output reg branch, output reg regWrite, output reg jumpR);*/
 		/*ctrlckt_c(input [1:0] opcode_c, output reg memRd_c,  output reg memWr_c, output reg [1:0] regData_c, 
@@ -508,23 +506,30 @@ output reg regWrite_c);*/
 			ctrlckt ctrrlckt1(instruction[6:0], instruction[14:12], alusrcB, aluOp, memRd, memWr, regData,
 									branch, regWr, jumpR);	
 									
-			ctrlckt_c ctrlckt_c1(instruction[1:0], memRd_c, memWr_c, regData_c, regWr_c);
+			ctrlckt_c ctrlckt_c1(instruction_c[1:0], memRd_c, memWr_c, regData_c, regWr_c);
 			
-			mux2to1_32bits(regWrData, pcplus4_if_id, regData ,mux2to1Out);
-			
-			wire mux2to1_5bits_signal;
-			or(mux2to1_5bits_signal, instruction_c[1], instruction_c[0]);
-			
-			wire [4:0] rd_c_in_muxout; wire [4:0] rs_c_in_muxout;
-			wire [4:0] rd_c_zeroext; wire [4:0] rs_c_zeroext;
-			zeroext3to5 zeroext3to5_rd_c(instruction_c[4:2],rd_c_zeroext);
-			zeroext3to5 zeroext3to5_rs_c(instruction_c[9:7],rs_c_zeroext);
-			
+			mux2to1_32bits mm(regWrData, pcplus4_if_id, regData ,mux2to1Out);
+			 
+			//wire mux2to1_5bits_signal;
+			//or(mux2to1_5bits_signal_id_ex, instruction_c[1], instruction_c[0]);
+			always@(mux2to1_5bits_signal_id_ex)
+			begin
+				mux2to1_5bits_signal_id_ex = instruction_c[1] | instruction_c[0];
+			end
+			//wire [4:0] rd_c_in_muxout; wire [4:0] rs_c_in_muxout;
+			//wire [4:0] rd_c_zeroext; 
+			zeroext3to5 zeroext3to5_rd_c(instruction_c[4:2],rs_c_zeroext3to5_id_ex);
+			zeroext3to5 zeroext3to5_rs_c(instruction_c[9:7],rs_c_zeroext3to5_id_ex);
+			 
 			//mux2to1_5bits mux2to1_5bits_rs_c_in(rs_c_zeroext,instruction_c[6:2] , mux2to1_5bits_signal,rs_c_in_muxout );
-			mux2to1_5bits mux2to1_5bits_rd_c_in(rd_c_zeroext,instruction_c[11:7] , mux2to1_5bits_signal,rd_c_in_muxout );
-			
+			//mux2to1_5bits mux2to1_5bits_rd_c_in(rd_c_zeroext,instruction_c[11:7] , mux2to1_5bits_signal,rd_c_in_muxout );
+		
+		/*registerFile(input clk, input reset, input regWrite, input regWrite_c, input [4:0] rs, input [4:0] rt,
+		input [4:0] rd, input [4:0] rs_c, input [4:0] rt_c, input [4:0] rd_c, input [31:0] writeData, input [31:0] writeData_c,
+		output [31:0] rsOut, output [31:0] rtOut,output [31:0] rsOut_c, output [31:0] rtOut_c);*/
+		
 		registerFile registerFile1(clk, reset,regWr, regWr_c, instruction[19:15] , instruction[24:20],
-		instruction[11:7], rs_c_zeroext, instruction_c[11:7], rd_c_in_muxout, regWrData,
+		rd, rs_c_zeroext, instruction_c[11:7], rd_c, regWrData,
 		regWrData_c, reg_rs_id_ex, reg_rt_id_ex , reg_rs_c_id_ex, reg_rt_c_id_ex);
 		
 		//24:20 shamt
@@ -600,17 +605,17 @@ module ex_pipeline(input  [1:0] alusrcB,input  [1:0] aluOp,input  memRd,input  m
 		input  [31:0] reg_rs_c,input  [4:0] rd, input  [4:0] rd_c, 
 		input  [31:0] reg_rt_c, input  [31:0] concat_val,input  [31:0] zeroext5to32, input  [31:0]signext5to32,
 		input  [31:0] signext12to32,
-		input  [31:0] pcplus4, input [31:0] DataOut_ex_mem, 
-		input [31:0] regDataOut_c_ex_mem, input [31:0] aluOut_jalr_ex_mem,input  [31:0] sext5to32_c,
+		input  [31:0] pcplus4, input  [31:0] sext5to32_c, input[4:0] rd_c_signext3to5_id_ex,
+		input mux2to1_5bits_signal_id_ex,
 		/*input [31:0] wire_rd_ex_mem, input [31:0] wire_rd_c_ex_mem,*/
 		/*output reg [31:0] wire_rd_id_ex, output reg[31:0] wire_rd_c_id_ex,*/
 		output reg [31:0] sext5to32_c_ex_mem,output reg [4:0] rd_c_ex_mem,
-		output reg [4:0] rd_ex_mem, output aluOut_jalr_id_ex, output reg memRd_ex_mem, 
+		output reg [4:0] rd_ex_mem, output reg memRd_ex_mem, 
 		output reg memWr_ex_mem, output reg regData_ex_mem,output reg branch_ex_mem,output reg regWrite_ex_mem,
 		output reg jumpR_ex_mem,output reg memRd_c_ex_mem, output reg memWr_c_ex_mem,
 		output reg [1:0] regData_c_ex_mem, output reg regWrite_c_ex_mem, output reg [31:0] aluOut_ex_mem,
-		output reg [31:0] aluOut_c_ex_mem, output reg [31:0] pcplus4_ex_mem, output reg [31:0] regDataOut_id_ex,
-		output reg [31:0] regDataOut_c_id_ex ,output reg [31:0] reg_rt_c_ex_mem,output reg [31:0]  regDataOut_ex_mem
+		output reg [31:0] aluOut_c_ex_mem, output reg [31:0] pcplus4_ex_mem,output reg [31:0] reg_rt_c_ex_mem,
+		output reg [31:0]  regDataOut_ex_mem
 		);
 /*ctrlckt(input [6:0] opcode, input [2:0] fun3,output reg [1:0]alusrcB, output reg [1:0]aluOp, output reg memRd,
  output reg memWr, output reg regData,output reg branch, output reg regWrite, output reg jumpR);*/
@@ -618,11 +623,16 @@ module ex_pipeline(input  [1:0] alusrcB,input  [1:0] aluOp,input  memRd,input  m
 output reg regWrite_c);*/
 	wire [31:0] muxOut;
 	//calling alusrcB mux
-	mux4to1_32bit mux4to1_32bit_alusrcB(_rt,signext5to32,zeroext12to32,alusrcB, muxOut);
+	mux4to1_32bit mux4to1_32bit_alusrcB(reg_rt,signext5to32,zeroext12to32,alusrcB, muxOut);
 	//calling main alu
 	alu alu1(reg_rs,muxOut,aluOp,aluOut_ex_mem);
 	//calling main alu_c
 	alu_c alu_c1(reg_rs_c,concat_val,aluOut_ex_mem);
+	
+	//mux2to1_5bits mux2to1_5bits_rd_c_in(rd_c_zeroext,instruction_c[11:7] , mux2to1_5bits_signal,rd_c_in_muxout );
+	//input[4:0] rs_c_zeroext3to5_id_ex, input mux2to1_5bits_signal_id_ex
+	mux2to1_5bit(rd_c_signext3to5_id_ex, rd_c, mux2to1_5bits_signal_id_ex,rd_c_ex_mem );
+	
 	
 	//Propogating parameters remaining same across the pipeline
 	//TODO replace * with sensitivity list
@@ -640,8 +650,8 @@ output reg regWrite_c);*/
 			rd_c_ex_mem = rd_c;
 			reg_rt_c_ex_mem = reg_rt_c;
 			sext5to32_c_ex_mem = sext5to32_c;
-			regDataOut_id_ex = regDataOut_ex_mem;
-			regDataOut_c_id_ex = regDataOut_c_ex_mem;
+			//regDataOut_id_ex = regDataOut_ex_mem;
+			//regDataOut_c_id_ex = regDataOut_c_ex_mem;
 			//wire_rd_id_ex = wire_rd_ex_mem;
 			//wire_rd_c_id_ex = wire_rd_c_ex_mem;
 		end
@@ -709,29 +719,54 @@ module main(input clk, input reset);
 						 output reg [31:0] concat_val, output reg [31:0] zeroext5to32_id_ex, output reg [31:0] signext5to32_id_ex,
 						 output reg [31:0] signext12to32_id_ex, output reg [4:0] rd_id_ex, output reg [4:0] rd_c_id_ex,
 						 output reg branch, output reg jumpR, output reg [31:0] pcplus4_id_ex, output reg [31:0] sign12to32_sh*/
-		reg [31:0] pcplus4_if_id, instruction, instruction_c, regWrData_if_id, regWrData_c_if_id;
-		reg [4:0] rd, rd_c;
+		reg [31:0] pcplus4_if_id, instruction, regWrData_if_id, regWrData_c_if_id;
+		reg [15:0] instruction_c;
+		wire [4:0] rd, rd_c;wire [31:0] regWrData; wire [31:0] regWrData_c;
 		
-		
+		/*id_pipeline id_pipeline1(clk, reset, pcplus4_if_id, instruction,  instruction_c,
+						  rd,
+						  rd_c,  regWrData, regWrData_c,
+						 alusrcB_id_ex, aluOp_id_ex, memRd_id_ex, memWr_id_ex, regWrite_id_ex,
+						 memRd_c_id_ex, memWr_c_id_ex, regData_c_id_ex, regWrite_c_id_ex,
+						 reg_rs_id_ex, reg_rt_id_ex, reg_rs_c_id_ex,
+						 reg_rt_c_id_ex,
+						 concat_val_id_ex, zeroext5to32_id_ex, signext5to32_id_ex,
+						 signext12to32_id_ex, rd_id_ex, rd_c_id_ex,
+						 branch_id_ex, jumpR_id_ex, pcplus4_id_ex, sext5to32_c_id_ex);	*/
 		//_id_ex pipeline
-		reg  [1:0] alusrcB_id_ex;reg  [1:0] aluOp_id_ex;reg  memRd_id_ex;reg  memWr;reg  regData_id_ex;
+		reg  [1:0] alusrcB_id_ex;reg  [1:0] aluOp_id_ex;reg  memRd_id_ex;reg  memWr_id_ex;reg  regData_id_ex;
 		reg  branch_id_ex;reg regWrite_id_ex;reg  jumpR_id_ex;reg  memRd_c_id_ex; reg  memWr_c_id_ex;
 		reg  [1:0] regData_c_id_ex;	reg  regWrite_c_id_ex; reg  [31:0] reg_rs_id_ex; reg  [31:0] reg_rt_id_ex;
 		reg  [31:0] reg_rs_c_id_ex;reg  [4:0] rd_id_ex; reg  [4:0] rd_c_id_ex; 
 		reg  [31:0] reg_rt_c_id_ex; reg  [31:0] concat_val_id_ex;reg  [31:0] zeroext5to32_id_ex; reg  [31:0]signext5to32_id_ex;
 		reg  [31:0] signext12to32_id_ex;
-		reg  [31:0] pcplus4_id_ex; reg [31:0] DataOut_ex_mem_id_ex; 
+		reg  [31:0] pcplus4_id_ex; reg [31:0] regDataOut_ex_mem_id_ex; 
 		reg  [31:0] sext5to32_c_id_ex;
 		//reg [31:0] wire_rd_ex_mem, reg [31:0] wire_rd_c_ex_mem,
 		
+		/*ex_pipeline(alusrcB_id_ex, aluOp_id_ex, memRd_id_ex, memWr_id_ex,regData_id_ex,
+		branch_id_ex,input regWrite,jumpR_id_ex,input  memRd_c, input  memWr_c,
+		regData_c_id_ex,	regWrite_c_id_ex, reg_rs_id_ex, reg_rt_id_ex,
+		reg_rs_c_id_ex, rd_id_ex, rd_c_id_ex, 
+		reg_rt_c_id_ex, concat_val_id_ex, zeroext5to32_id_ex, signext5to32_id_ex,
+		signext12to32_id_ex,
+		pcplus4_id_ex, sext5to32_c_id_ex,
+		sext5to32_c_ex_mem,rd_c_ex_mem,
+		rd_ex_mem, memRd_ex_mem, 
+		memWr_ex_mem, regData_ex_mem, branch_ex_mem, regWrite_ex_mem,
+		jumpR_ex_mem,memRd_c_ex_mem, memWr_c_ex_mem,
+		regData_c_ex_mem, regWrite_c_ex_mem ,aluOut_ex_mem,
+		aluOut_c_ex_mem, pcplus4_ex_mem, 
+		reg_rt_c_ex_mem,regDataOut_ex_mem);*/
+				
 		//_ex_mem pipeline
 		reg [31:0] sext5to32_c_ex_mem; reg [4:0] rd_c_ex_mem;
 		reg [4:0] rd_ex_mem;  reg memRd_ex_mem; 
 		reg memWr_ex_mem;  reg regData_ex_mem; reg branch_ex_mem; reg regWrite_ex_mem;
 		reg jumpR_ex_mem; reg memRd_c_ex_mem;  reg memWr_c_ex_mem;
 		reg [1:0] regData_c_ex_mem;  reg regWrite_c_ex_mem;  reg [31:0] aluOut_ex_mem;
-		reg [31:0] aluOut_c_ex_mem;  reg [31:0] pcplus4_ex_mem;  reg [31:0] regDataOut_id_ex;
-		reg [31:0] regDataOut_c_id_ex ; reg [31:0] reg_rt_c_ex_mem; reg [31:0]  regDataOut_ex_mem;
+		reg [31:0] aluOut_c_ex_mem;  reg [31:0] pcplus4_ex_mem; reg [31:0] reg_rt_c_ex_mem; reg [31:0]  regDataOut_ex_mem;
+		
 		
 		//_mem_wb pipeline
 		  reg regWrite_mem_id; reg regWrite_c_mem_id;
@@ -739,5 +774,16 @@ module main(input clk, input reset);
 						   reg [31:0] aluOut_c_mem_id;  reg [31:0] aluOut_mem_id;  reg [31:0] dmOut;
 						   reg [31:0] reg_rt_mem_mux; reg [1:0] regData_c_mem_mux;  reg [4:0] rd_mem_mux;
 						   reg [4:0] rd_c_mem_mux;  reg [31:0] sext5to32_c_mem_mux; reg [31:0] reg_rt_c_mem_mux;
+							
+		/*id_pipeline(clk, reset, input [31:0] pcplus4_if_id, input [31:0]instruction, input [15:0] instruction_c,
+						 input [4:0] rd,
+						 input [4:0] rd_c, input [31:0] regWrData, input [31:0] regWrData_c,
+						 output reg [1:0] alusrcB, output reg [1:0] aluOp, output reg memRd, output reg memWr, output reg regWr,
+						 output reg memRd_c, output reg memWr_c, output reg [1:0] regData_c, output reg regWr_c,
+						 output reg [31:0] reg_rs_id_ex, output reg [31:0] reg_rt_id_ex, output reg [31:0] reg_rs_c_id_ex,
+						 output reg [31:0] reg_rt_c_id_ex,
+						 output reg [31:0] concat_val, output reg [31:0] zeroext5to32_id_ex, output reg [31:0] signext5to32_id_ex,
+						 output reg [31:0] signext12to32_id_ex, output reg [4:0] rd_id_ex, output reg [4:0] rd_c_id_ex,
+						 output reg branch, output reg jumpR, output reg [31:0] pcplus4_id_ex, output reg [31:0] sign12to32_sh);	*/				
 
 endmodule
