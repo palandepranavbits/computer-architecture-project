@@ -788,10 +788,11 @@ module main(input clk, input reset);
 
 endmodule
 
+
 module testbench;
 reg clk;
 reg reset;
-main(clk,reset);
+main main1(clk,reset);
 
 always 
 #5 clk=~clk;
@@ -805,4 +806,3 @@ begin
 end
 
 endmodule
-
