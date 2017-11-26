@@ -787,3 +787,22 @@ module main(input clk, input reset);
 						 output reg branch, output reg jumpR, output reg [31:0] pcplus4_id_ex, output reg [31:0] sign12to32_sh);	*/				
 
 endmodule
+
+module testbench;
+reg clk;
+reg reset;
+main(clk,reset);
+
+always 
+#5 clk=~clk;
+
+initial
+begin
+	clk=0;
+	reset=1;
+	#5 reset=0;
+	#100 $finish;
+end
+
+endmodule
+
