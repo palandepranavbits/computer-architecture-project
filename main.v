@@ -741,3 +741,22 @@ module main(input clk, input reset);
 						   reg [4:0] rd_c_mem_mux;  reg [31:0] sext5to32_c_mem_mux; reg [31:0] reg_rt_c_mem_mux;
 
 endmodule
+
+module testbench;
+reg clk;
+reg reset;
+main(clk,reset);
+
+always 
+#5 clk=~clk;
+
+initial
+begin
+	clk=0;
+	reset=1;
+	#5 reset=0;
+	#100 $finish;
+end
+
+endmodule
+
