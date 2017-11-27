@@ -125,7 +125,7 @@ module IM(input clk, input reset, input[5:0] PC_Sel, output[63:0] IR);
 	register_IM reg62(clk, reset, 32'h0000_0000, Qout62);
 	register_IM reg63(clk, reset, 32'h0000_0000, Qout63);
 	register_IM reg00(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout00);
-	register_IM reg01(clk, reset, 32'b0000_0000_0000_0000_010_0_00001_11110_01, Qout01); //C.LI $1 011110
+	register_IM reg01(clk, reset, 32'b0000_0000_0000_0000_010_0_00001_00100_01, Qout01); //C.LI $1 000100
 	register_IM reg02(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout02); 
 	register_IM reg03(clk, reset, 32'b0000_0000_0000_0000_010_1_00010_10110_01, Qout03); //C.LI $2 110110
 	register_IM reg04(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout04);
@@ -136,11 +136,11 @@ module IM(input clk, input reset, input[5:0] PC_Sel, output[63:0] IR);
 	register_IM reg09(clk, reset, 32'b0000_0000_0000_0000_1000_00101_00010_10, Qout09); //C.MV $5 $2
 	register_IM reg10(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout10);
 	register_IM reg11(clk, reset, 32'b0000_0000_0000_0000_1000_00110_00011_10, Qout11); //C.MV $6 $3
-	register_IM reg12(clk, reset, 32'b0100000_11100_00001_101_00100_0010011, Qout12); //srai $1 $4 11100
+	register_IM reg12(clk, reset, 32'b0100000_00010_00001_101_00100_0010011, Qout12); //srai $1 $4 00010
 	register_IM reg13(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout13); 
 	register_IM reg14(clk, reset, 32'b0000000_00011_00100_000_00010_0110011, Qout14); //add $2 $4 $3
 	register_IM reg15(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout15);
-	register_IM reg16(clk, reset, 32'b111111000000_0010_000_00011_1100111, Qout16); //jalr $3 $4 111111000000
+	register_IM reg16(clk, reset, 32'b111111000000_0111_000_00011_1100111, Qout16); //jalr $3 $7 1111_1100_0000
 	register_IM reg17(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout17);
 	register_IM reg18(clk, reset, 32'b111000111000_00001_110_00110_0010011, Qout18); // andi $1 $6 111000111000
 	register_IM reg19(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout19);
@@ -848,7 +848,8 @@ module signext6to32(input [5:0] in, output reg [31:0] out);
 		begin
 			//out = {27'b0,in};
 			//TODO check in debugging
-			out = $signed(in);
+			//out = $signed(in);
+			out = {{26{in[5]}},in};
 		end
 endmodule
 
@@ -856,7 +857,7 @@ module zeroext3to5(input [2:0] in, output reg [4:0] out);
 	always@(in)
 		begin
 			out = {2'b0,in};
-			
+			 
 		end
 endmodule
 
@@ -865,7 +866,8 @@ module signext12to32(input [11:0] in, output reg [31:0] out);
 		begin
 			//out={20{in[11]},in};
 			//TODO check in debugging
-			out = $signed(in);
+			//out = $signed(in);
+			out = {{20{in[11]}},in};
 		end
 endmodule
 // TODO check if wire rd actually goes into id module in instantiation
@@ -1362,6 +1364,6 @@ module testbench;
 		begin
 			clk=0;reset=1;
 			#15 reset=0;
-			#100 $finish;
+			#200 $finish;
 		end
 endmodule
