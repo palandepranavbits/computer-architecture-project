@@ -89,7 +89,7 @@ module mux32to1_IM(input [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,
 			5'd31: outBus = {outR62,outR63};
 		endcase
 endmodule
-
+ 
 module IM(input clk, input reset, input[4:0] PC_Sel, output[63:0] IR);
 	wire [15:0] Qout00, Qout01, Qout02, Qout03, Qout04, Qout05, Qout06, Qout07,
 					Qout08, Qout09, Qout10, Qout11, Qout12, Qout13, Qout14, Qout15,
@@ -172,7 +172,7 @@ module IM(input clk, input reset, input[4:0] PC_Sel, output[63:0] IR);
 					Qout32, Qout33, Qout34, Qout35, Qout36, Qout37, Qout38, Qout39,
 					Qout40, Qout41, Qout42, Qout43, Qout44, Qout45, Qout46, Qout47,
 					Qout48, Qout49, Qout50, Qout51, Qout52, Qout53, Qout54, Qout55,
-					Qout56, Qout57, Qout58, Qout59, Qout60, Qout61, Qout62, Qout63, PC_Sel, IR);
+					Qout56, Qout57, Qout58, Qout59, Qout60, Qout61, Qout62, Qout63, PC_Sel[5:1], IR);
 					
 endmodule
 	

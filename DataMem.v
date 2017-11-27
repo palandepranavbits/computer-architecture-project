@@ -1,4 +1,4 @@
-module D_ff_DM(input clk, input reset, input MemWr, input MemWrComp, input start, input in, input D_Out);
+module D_ff_DM(input clk, input reset, input MemWr, input MemWrComp, input start, input in, output reg D_out);
 	
 	always@(negedge clk)
 		begin
@@ -11,7 +11,8 @@ module D_ff_DM(input clk, input reset, input MemWr, input MemWrComp, input start
 endmodule
 
 
-module Register_DM(input clk, input reset, input MemWr, input MemWrComp, input[31:0] start, input[31:0] in, output[31:0] RegOut);
+module Register_DM(input clk, input reset, input MemWr, input MemWrComp, input[31:0] start, input[31:0] in,
+				output[31:0] RegOut);
 
 	D_ff_DM D_00(clk, reset, MemWr, MemWrComp, start[0], in[0], RegOut[0]);
 	D_ff_DM D_01(clk, reset, MemWr, MemWrComp, start[1], in[1], RegOut[1]);
@@ -51,36 +52,43 @@ endmodule
 
 
 
-module Mux16to1(input[31:0] Out00, Out01, Out02, Out03, Out04, Out05, Out06, Out07, Out08, Out09 Out10, Out11, Out12, Out13, Out14, Out15, input[3:0] Sel, output[31:0] MuxOut);
-	always@(Out00, Out01, Out02, Out03, Out04, Out05, Out06, Out07, Out08, Out09 Out10, Out11, Out12, Out13, Out14, Out15, Sel)
+module Mux16to1(input[31:0] Out00, Out01, Out02, Out03, Out04, Out05, Out06, Out07, Out08, 
+					Out09, Out10, Out11, Out12, Out13, Out14, Out15, input[3:0] Sel,input MemRd, output reg [31:0] MuxOut);
+	always@(Out00, Out01, Out02, Out03, Out04, Out05, Out06, Out07, Out08, Out09, Out10, Out11, Out12, Out13, 
+	Out14, Out15, Sel)
 		begin
-		case(Sel)
-			4'b0000:MuxOut=Out00;
-			4'b0001:MuxOut=Out01;
-			4'b0010:MuxOut=Out02;
-			4'b0011:MuxOut=Out03;
-			4'b0100:MuxOut=Out04;
-			4'b0101:MuxOut=Out05;
-			4'b0110:MuxOut=Out06;
-			4'b0111:MuxOut=Out07;
-			4'b1000:MuxOut=Out08;
-			4'b1001:MuxOut=Out09;
-			4'b1010:MuxOut=Out10;
-			4'b1011:MuxOut=Out11;
-			4'b1100:MuxOut=Out12;
-			4'b1101:MuxOut=Out13;
-			4'b1110:MuxOut=Out14;
-			4'b1111:MuxOut=Out15;
-		endcase
+		if(MemRd == 1)
+			begin
+				case(Sel)
+					4'b0000:MuxOut=Out00;
+					4'b0001:MuxOut=Out01;
+					4'b0010:MuxOut=Out02;
+					4'b0011:MuxOut=Out03;
+					4'b0100:MuxOut=Out04;
+					4'b0101:MuxOut=Out05;
+					4'b0110:MuxOut=Out06;
+					4'b0111:MuxOut=Out07;
+					4'b1000:MuxOut=Out08;
+					4'b1001:MuxOut=Out09;
+					4'b1010:MuxOut=Out10;
+					4'b1011:MuxOut=Out11;
+					4'b1100:MuxOut=Out12;
+					4'b1101:MuxOut=Out13;
+					4'b1110:MuxOut=Out14;
+					4'b1111:MuxOut=Out15;
+				endcase 
+			end
+		else
+			MuxOut=32'b0;
 		end
 
 endmodule
 
-module Decoder4to16(input[3:0]in, output[15:0]decOut);
+module Decoder4to16(input[3:0]in, output reg [15:0]decOut);
 
 always@(in)
 begin
-	case(in):
+	case(in)
 	4'd0:decOut=16'b0000_0000_0000_0001;
 	4'd1:decOut=16'b0000_0000_0000_0010;
 	4'd2:decOut=16'b0000_0000_0000_0100;
@@ -94,7 +102,7 @@ begin
 	4'd10:decOut=16'b0000_0100_0000_0000;
 	4'd11:decOut=16'b0000_1000_0000_0000;
 	4'd12:decOut=16'b0001_0000_0000_0000;
-	4'd13:decOut=16'b0010_0000_0000_0000;
+	4'd13:decOut=16'b0010_0000_0000_0000; 
 	4'd14:decOut=16'b0100_0000_0000_0000;
 	4'd15:decOut=16'b1000_0000_0000_0000;
 	endcase
@@ -102,9 +110,11 @@ end
 endmodule
 
 
-module DM(input clk, input reset, input MemWr, input MemWrComp, input[31:0] in, input[31:0] addr, input[31:0 addr_c, output[31:0] DM_out);
+module DM(input clk, input reset,input MemRd, input MemRdComp, input MemWr, input MemWrComp, input[31:0] in, input[31:0] addr, 
+		input[31:0] addr_c, output reg [31:0] DM_out);
 
-	wire[31:0] Out00, Out01, Out02, Out03, Out04, Out05, Out06, Out07, Out08, Out09 Out10, Out11, Out12, Out13, Out14, Out15;
+	wire[31:0] Out00, Out01, Out02, Out03, Out04, Out05, Out06, Out07, Out08, Out09, Out10, Out11, Out12, Out13,
+	Out14, Out15;
 	wire[15:0] decOut, decOut_c;
 	
 	
@@ -129,7 +139,8 @@ module DM(input clk, input reset, input MemWr, input MemWrComp, input[31:0] in, 
 	Register_DM Reg14(clk, reset, decOut[14]&MemWr, decOut_c[14]&MemWrComp, 32'd33, in, Out14);
 	Register_DM Reg15(clk, reset, decOut[15]&MemWr, decOut_c[15]&MemWrComp, 32'd21, in, Out15);
 	
-	Mux16to1 Mux1(Out00, Out01, Out02, Out03, Out04, Out05, Out06, Out07, Out08, Out09 Out10, Out11, Out12, Out13, Out14, Out15, addr[5:2], DM_out);
+	Mux16to1 Mux1(Out00, Out01, Out02, Out03, Out04, Out05, Out06, Out07, Out08, Out09, Out10, Out11, 
+	Out12, Out13, Out14, Out15, addr[5:2], MemRd | MemRdComp,DM_out);
 	
 endmodule
 
