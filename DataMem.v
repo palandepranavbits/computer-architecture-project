@@ -107,7 +107,7 @@ end
 endmodule
 
 
-module DM(input clk, input reset, input MemWr, input MemWrComp, input[31:0] in, input[31:0] addr, input[31:0] addr_c, output[31:0] DM_out);
+module DM(input clk, input reset, input MemRd, input MemRdComp, input MemWr, input MemWrComp, input[31:0] in, input[31:0] addr, input[31:0] addr_c, output[31:0] DM_out);
 
 	wire[31:0] Out00, Out01, Out02, Out03, Out04, Out05, Out06, Out07, Out08, Out09 Out10, Out11, Out12, Out13, Out14, Out15;
 	wire[15:0] decOut, decOut_c;
