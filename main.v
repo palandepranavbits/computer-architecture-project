@@ -121,7 +121,9 @@ module IM(input clk, input reset, input[5:0] PC_Sel, output[63:0] IR);
 					Qout40, Qout41, Qout42, Qout43, Qout44, Qout45, Qout46, Qout47,
 					Qout48, Qout49, Qout50, Qout51, Qout52, Qout53, Qout54, Qout55,
 					Qout56, Qout57, Qout58, Qout59, Qout60, Qout61, Qout62, Qout63;
-					
+	
+	register_IM reg62(clk, reset, 32'h0000_0000, Qout62);
+	register_IM reg63(clk, reset, 32'h0000_0000, Qout63);
 	register_IM reg00(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout00);
 	register_IM reg01(clk, reset, 32'b0000_0000_0000_0000_010_0_00001_11110_01, Qout01); //C.LI $1 011110
 	register_IM reg02(clk, reset, 32'b0000_0000_0000_0000_0000_0000_0000_0000, Qout02); 
@@ -184,17 +186,16 @@ module IM(input clk, input reset, input[5:0] PC_Sel, output[63:0] IR);
 	register_IM reg59(clk, reset, 32'h0000_0000, Qout59);
 	register_IM reg60(clk, reset, 32'h0000_0000, Qout60);
 	register_IM reg61(clk, reset, 32'h0000_0000, Qout61);
-	register_IM reg62(clk, reset, 32'h0000_0000, Qout62);
-	register_IM reg63(clk, reset, 32'h0000_0000, Qout63);
 	
-	mux32to1_IM IM_Mux(Qout00, Qout01, Qout02, Qout03, Qout04, Qout05, Qout06, Qout07,
+	
+	mux32to1_IM IM_Mux( Qout62, Qout63, Qout00, Qout01, Qout02, Qout03, Qout04, Qout05, Qout06, Qout07,
 					Qout08, Qout09, Qout10, Qout11, Qout12, Qout13, Qout14, Qout15,
 					Qout16, Qout17, Qout18, Qout19, Qout20, Qout21, Qout22, Qout23,
 					Qout24, Qout25, Qout26, Qout27, Qout28, Qout29, Qout30, Qout31,
 					Qout32, Qout33, Qout34, Qout35, Qout36, Qout37, Qout38, Qout39,
 					Qout40, Qout41, Qout42, Qout43, Qout44, Qout45, Qout46, Qout47,
 					Qout48, Qout49, Qout50, Qout51, Qout52, Qout53, Qout54, Qout55,
-					Qout56, Qout57, Qout58, Qout59, Qout60, Qout61, Qout62, Qout63, PC_Sel[5:1], IR);
+					Qout56, Qout57, Qout58, Qout59, Qout60, Qout61, {1'b0,PC_Sel[5:2]}, IR);
 					
 endmodule
 	
@@ -1066,7 +1067,7 @@ output reg regWrite_c);*/
 			reg_rt_c_ex_mem = reg_rt_c;
 			signext6to32_cli_ex_mem = signext6to32_cli_id_ex;
 			regData_ex_mem = regData;
-			regData_c_ex_mem = regData_ex_mem;
+			regData_c_ex_mem = regData_c;
 			reg_rt_ex_mem = reg_rt;
 			//regDataOut_id_ex = regDataOut_ex_mem;
 			//regDataOut_c_id_ex = regDataOut_c_ex_mem;
@@ -1110,14 +1111,18 @@ module mem_pipeline(input clk, input reset,input regWrite, input regWrite_c,inpu
 		aluOut_c_ex_mem, dmOut);
 			
 			//TODO remove * with sensitivity list			  
-				always@(*)
+				always@( clk,  reset, regWrite,  regWrite_c,  memRd,  memWr,   memRd_c,
+						    memWr_c, 
+						    regData_c,   rd,  rd_c,  signext6to32_cli_ex_mem,
+						     reg_rt_c, aluOut_ex_mem,  aluOut_c_ex_mem, 
+						    pcplus4_ex_mem,  regData_ex_mem)
 					begin
 						reg_rt_c_mem_mux = reg_rt_c;
 						rd_c_mem_mux = rd_c;
 						rd_mem_mux = rd;
 						signext6to32_cli_mem_mux = signext6to32_cli_ex_mem;
-						aluOut_c_mem_id = aluOut_c_mem_id;
-						aluOut_mem_id = aluOut_mem_id;
+						aluOut_c_mem_id = aluOut_c_ex_mem;
+						aluOut_mem_id = aluOut_ex_mem;
 						pcplus4_mem_if = pcplus4_ex_mem;
 						regWrite_c_mem_id = regWrite_c;
 						regWrite_mem_id = regWrite;
@@ -1253,7 +1258,6 @@ module main(input clk, input reset);
 						 reg_rs_id_ex, reg_rt_id_ex, reg_rs_c_id_ex,
 						 reg_rt_c_id_ex,
 						 zeroext22to32_cl_id_ex, zeroext5to32_id_ex, signext5to32_id_ex,
-						 
 						 signext12to32_id_ex, rd_id_ex, rd_c_id_ex,
 						 branch_id_pc, jumpR_id_pc, pcplus4_id_ex, signext12to32_sh, rd_c_zeroext3to5_id_ex,
 						 mux2to1_5bits_signal_id_ex,
@@ -1297,7 +1301,8 @@ module main(input clk, input reset);
 		reg_rt_c_ex_mem, reg_rt_ex_mem);
 				
 		
-		/*mem_pipeline(input clk, input reset,input regWrite, input regWrite_c,input  memRd,input  memWr, input  memRd_c, input  memWr_c, 
+		/*mem_pipeline(input clk, input reset,input regWrite, input regWrite_c,input  memRd,input  memWr, input  memRd_c, 
+							input  memWr_c, 
 						  input  [1:0] regData_c, input  [4:0] rd, input  [4:0] rd_c, input [31:0] signext6to32_cli_ex_mem,
 						  input  [31:0] reg_rt_c,input [31:0] aluOut_ex_mem, input [31:0] aluOut_c_ex_mem, 
 						  input [5:0] pcplus4_ex_mem, input regData_ex_mem,
