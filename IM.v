@@ -43,7 +43,7 @@ module register_IM(input clk, input reset, input[31:0] d_input, output[31:0] q_o
 
 endmodule
 
-module mux32to1_IM(input [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,outR12,outR13,outR14,outR15,
+module mux64to1_IM(input [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,outR8,outR9,outR10,outR11,outR12,outR13,outR14,outR15,
 	outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,outR24,outR25,outR26,outR27,outR28,outR29,outR30,outR31,outR32,outR33,
 	outR34,outR35,outR36,outR37,outR38,outR39,outR40,outR41,outR42,outR43,outR44,outR45,outR46,outR47,outR48,outR49,outR50,outR51,
 	outR52,outR53,outR54,outR55,outR56,outR57,outR58,outR59,outR60,outR61,outR62,outR63,
@@ -90,7 +90,7 @@ module mux32to1_IM(input [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,
 		endcase
 endmodule
 
-module IM(input clk, input reset, input[4:0] PC_Sel, output[63:0] IR);
+module IM(input clk, input reset, input[5:0] PC_Sel, output[63:0] IR);
 	wire [15:0] Qout00, Qout01, Qout02, Qout03, Qout04, Qout05, Qout06, Qout07,
 					Qout08, Qout09, Qout10, Qout11, Qout12, Qout13, Qout14, Qout15,
 					Qout16, Qout17, Qout18, Qout19, Qout20, Qout21, Qout22, Qout23,
@@ -165,14 +165,14 @@ module IM(input clk, input reset, input[4:0] PC_Sel, output[63:0] IR);
 	register_IM reg62(clk, reset, 32'h0000_0000, Qout62);
 	register_IM reg63(clk, reset, 32'h0000_0000, Qout63);
 	
-	mux32to1_IM IM_Mux(Qout00, Qout01, Qout02, Qout03, Qout04, Qout05, Qout06, Qout07,
+	mux64to1_IM IM_Mux(Qout00, Qout01, Qout02, Qout03, Qout04, Qout05, Qout06, Qout07,
 					Qout08, Qout09, Qout10, Qout11, Qout12, Qout13, Qout14, Qout15,
 					Qout16, Qout17, Qout18, Qout19, Qout20, Qout21, Qout22, Qout23,
 					Qout24, Qout25, Qout26, Qout27, Qout28, Qout29, Qout30, Qout31,
 					Qout32, Qout33, Qout34, Qout35, Qout36, Qout37, Qout38, Qout39,
 					Qout40, Qout41, Qout42, Qout43, Qout44, Qout45, Qout46, Qout47,
 					Qout48, Qout49, Qout50, Qout51, Qout52, Qout53, Qout54, Qout55,
-					Qout56, Qout57, Qout58, Qout59, Qout60, Qout61, Qout62, Qout63, PC_Sel, IR);
+					Qout56, Qout57, Qout58, Qout59, Qout60, Qout61, Qout62, Qout63, PC_Sel[5:1], IR);
 					
 endmodule
 	
