@@ -371,7 +371,7 @@ module D_ff(input clk, input reset, input regWrite, input regWrite_c , input dec
 				begin
 					q = d;
 				end
-			if(regWrite_c == 1'b1 && decOut_c == 1'b1)
+			else if(regWrite_c == 1'b1 && decOut_c == 1'b1)
 				begin
 					q = d_c;
 				end
@@ -550,6 +550,10 @@ module registerSet( input clk, input reset, input regWrite, input [31:0] decOut,
 	input [31:0] writeData, input [31:0] writeData_c, output [31:0] outR0,outR1,outR2,outR3,outR4,outR5,outR6,outR7,
 		outR8,outR9,outR10,outR11,outR12,outR13,outR14,outR15,outR16,outR17,outR18,outR19,outR20,outR21,outR22,outR23,
 		outR24,outR25,outR26,outR27,outR28,outR29,outR30,outR31);
+		
+		/*register32bit( input clk, input reset, input regWrite, input decOut, input regWrite_c, input decOut_c,
+	input [31:0] writeData, input [31:0] writeData_c, output  [31:0] outR );
+*/
 		register32bit r00_rf( clk, reset, regWrite, decOut[0],  regWrite_c, decOut_c[0],  writeData, writeData_c, outR0 );
 		register32bit r01_rf( clk, reset, regWrite, decOut[1],  regWrite_c, decOut_c[1],  writeData, writeData_c, outR1 );
 		register32bit r02_rf( clk, reset, regWrite, decOut[2],  regWrite_c, decOut_c[2],  writeData, writeData_c, outR2 );
@@ -732,8 +736,19 @@ module ctrlckt(input [6:0] opcode, input [2:0] fun3,output reg [1:0]alusrcB, out
 					branch = 1'b1;
 					jumpR = 1'b0;
 				end
-			
-		end	
+		   else
+           begin
+            	alusrcB = 2'd0;
+					aluOp = 2'd0;
+					memRd = 1'b0;
+					memWr = 1'b0;
+					regData = 1'b0;
+					regWrite = 1'b0;
+					branch = 1'b0;
+					jumpR = 1'b0;		  
+		     end	
+		end
+		
 					
 endmodule					
 
@@ -769,7 +784,12 @@ output reg regWrite_c);
 							regWrite_c = 1;
 							
 						end		
-				
+				  default: begin
+				            memRd_c = 0;
+							memWr_c = 0;
+							regData_c = 2'b00;
+							regWrite_c = 0;
+							end
 			endcase
 		end
 endmodule
@@ -849,7 +869,7 @@ module signext12to32(input [11:0] in, output reg [31:0] out);
 endmodule
 // TODO check if wire rd actually goes into id module in instantiation
 
-module id_pipeline(input clk, input reset, input [5:0] pcplus4_if_id, input [31:0]instruction, input [15:0] instruction_c,
+module id_pipeline(input clk, input reset, input [31:0] pcplus4_if_id, input [31:0]instruction, input [15:0] instruction_c,
 						 input [4:0] rd,
 						 input [4:0] rd_c, input [31:0] regWrData, input [31:0] regWrData_c,
 						 output [1:0] alusrcB, output [1:0] aluOp, output memRd, output memWr, output regWr,
@@ -857,11 +877,11 @@ module id_pipeline(input clk, input reset, input [5:0] pcplus4_if_id, input [31:
 						 output [31:0] reg_rs_id_ex, output [31:0] reg_rt_id_ex, output [31:0] reg_rs_c_id_ex,
 						 output [31:0] reg_rt_c_id_ex,
 						 output [31:0] zeroext22to32_cl, output [31:0] zeroext5to32_id_ex, output reg [31:0] signext5to32_id_ex,
-						 output [31:0] signext12to32_id_ex, output [4:0] rd_id_ex, output [4:0] rd_c_id_ex,
-						 output branch, output jumpR, output [5:0] pcplus4_id_ex, output [31:0] signext12to32_sh,
+						 output [31:0] signext12to32_id_ex, output reg [4:0] rd_id_ex, output reg [4:0] rd_c_id_ex,
+						 output branch, output jumpR, output reg [31:0] pcplus4_id_ex, output [31:0] signext12to32_sh,
 						 output [4:0] rd_c_zeroext3to5_id_ex, output  reg mux2to1_5bits_signal_id_ex, 
 						 output [31:0] signext6to32_c_li,output regData_id_ex, output [31:0]signext12to32_bge,
-						 output reg greaterThanEqual);
+						 output reg greaterThan);
 						 
 		
 
@@ -878,11 +898,8 @@ output reg regWrite_c);*/
 						
 			ctrlckt_c ctrlckt_c1(instruction_c[1:0], memRd_c, memWr_c, regData_c, regWr_c);
 			
-			//mux2to1_32bits mm(regWrData, pcplus4_if_id, regData ,mux2to1Out);
-			 
-			//wire mux2to1_5bits_signal;
 			//or(mux2to1_5bits_signal_id_ex, instruction_c[1], instruction_c[0]);
-			always@(mux2to1_5bits_signal_id_ex)
+			always@(*)
 			begin
 				mux2to1_5bits_signal_id_ex = instruction_c[1] | instruction_c[0];
 			end
@@ -920,16 +937,20 @@ output reg regWrite_c);*/
 		
 		//reg_rs_id_ex, reg_rt_id_ex
 		
-		//wire greaterThanEqual;
+		//wire greaterThan;
 		
-		always@(pcplus4_if_id, instruction)
+		always@(*)
 		if(reg_rs_id_ex >= reg_rt_id_ex)
-			greaterThanEqual=1;
+			greaterThan=1;
 		else
-			greaterThanEqual=0;
-		
-			
-		
+			greaterThan=0;
+		always@(*)
+		begin
+			pcplus4_id_ex = pcplus4_if_id;	
+			//output [4:0] rd_id_ex, output [4:0] rd_c_id_ex
+			rd_id_ex = instruction[11:7];
+			rd_c_id_ex = instruction_c[11:7];
+		end
 		
 		
 				
@@ -984,14 +1005,14 @@ module ex_pipeline(input clk, input reset,input  [1:0] alusrcB,input  [1:0] aluO
 		input  [31:0] reg_rs_c,input  [4:0] rd, input  [4:0] rd_c, 
 		input  [31:0] reg_rt_c, input  [31:0] zeroext22to32_cl,input  [31:0] zeroext5to32_srai, input  [31:0]signext5to32,
 		input  [31:0] signext12to32_andi_jalr,
-		input  [5:0] pcplus4, input  [31:0] signext6to32_cli_id_ex, input[4:0] rd_c_signext3to5_id_ex,
+		input  [31:0] pcplus4, input  [31:0] signext6to32_cli_id_ex, input[4:0] rd_c_signext3to5_id_ex,
 		input mux2to1_5bits_signal_id_ex,input regData_id_ex,
 		output reg [31:0] signext6to32_cli_ex_mem,output [4:0] rd_c_ex_mem,
 		output reg [4:0] rd_ex_mem, output reg memRd_ex_mem, 
 		output reg memWr_ex_mem, output reg regData_ex_mem,output reg branch_ex_mem,output reg regWrite_ex_mem,
 		output reg jumpR_ex_mem,output reg memRd_c_ex_mem, output reg memWr_c_ex_mem,
 		output reg [1:0] regData_c_ex_mem, output reg regWrite_c_ex_mem, output [31:0] aluOut_ex_mem,
-		output [31:0] aluOut_c_ex_mem, output reg [5:0] pcplus4_ex_mem,output reg [31:0] reg_rt_c_ex_mem,
+		output [31:0] aluOut_c_ex_mem, output reg [31:0] pcplus4_ex_mem,output reg [31:0] reg_rt_c_ex_mem,
 		output reg [31:0] reg_rt_ex_mem);
 /*ctrlckt(input [6:0] opcode, input [2:0] fun3,output reg [1:0]alusrcB, output reg [1:0]aluOp, output reg memRd,
  output reg memWr, output reg regData,output reg branch, output reg regWrite, output reg jumpR);*/
@@ -1070,9 +1091,9 @@ module mem_pipeline(input clk, input reset,input regWrite, input regWrite_c,inpu
 						  input  memWr_c, 
 						  input  [1:0] regData_c, input  [4:0] rd, input  [4:0] rd_c, input [31:0] signext6to32_cli_ex_mem,
 						  input  [31:0] reg_rt_c,input [31:0] aluOut_ex_mem, input [31:0] aluOut_c_ex_mem, 
-						  input [5:0] pcplus4_ex_mem, input regData_ex_mem,
+						  input [31:0] pcplus4_ex_mem, input regData_ex_mem,
 						  output reg regWrite_mem_id,output reg regWrite_c_mem_id,input [31:0] reg_rt_ex_mem,
-						  output reg [5:0] pcplus4_mem_if,
+						  output reg [31:0] pcplus4_mem_if,
 						  output reg [31:0] aluOut_c_mem_id, output reg [31:0] aluOut_mem_id, output [31:0] dmOut,
 						  output reg [31:0] reg_rt_mem_mux, output reg [1:0] regData_c_mem_mux, output reg [4:0] rd_mem_mux,
 						  output reg [4:0] rd_c_mem_mux, output reg [31:0] signext6to32_cli_mem_mux,
@@ -1080,7 +1101,8 @@ module mem_pipeline(input clk, input reset,input regWrite, input regWrite_c,inpu
 			
 			//TODO insert cache
 			
-			/*module DM(input clk, input reset,input MemRd, input MemRdComp, input MemWr, input MemWrComp, input[31:0] in, input[31:0] addr, 
+			/*module DM(input clk, input reset,input MemRd, input MemRdComp, input MemWr, input MemWrComp, input[31:0] in, 
+			input[31:0] addr, 
 		input[31:0] addr_c, output reg [31:0] DM_out);*/
 		
 		//TODO memory to be made 16 bits from 32 bits
@@ -1109,8 +1131,8 @@ endmodule
 
 /////////////////////////////////////end of mem_pipeline///////////////////////////////////
 
-module adder(input clk, input [5:0] in1, input [5:0] in2, output reg [5:0] out1);
-	always@(negedge clk)
+module adder(input [31:0] in1, input [31:0] in2, output reg [31:0] out1);
+	always@(in1 or in2)
 		begin
 			out1 = in1 + in2;
 		end
@@ -1122,20 +1144,24 @@ module main(input clk, input reset);
 						 input [4:0] rd,
 						 input [4:0] rd_c, input [31:0] regWrData, input [31:0] regWrData_c*/
 		//if_id pipeline
+	//wire pcsrc;
+	wire [31:0] pc;
 	wire pcsrc;
-	
 	wire [31:0] branch_jumpR;
 	//signext12to32_bge
-	wire [31:0] signext12to32_bge; wire greaterThanEqual; 
+	wire [31:0] signext12to32_bge; wire greaterThan; 
 	wire branch_jumpR_signal_mux; wire  branch_id_pc; wire jumpR_id_pc;
 	or(pcsrc,branch_id_pc,jumpR_id_pc);
-	and(branch_jumpR_signal_mux,greaterThanEqual,branch_id_pc);
+	and(branch_jumpR_signal_mux,greaterThan,branch_id_pc);
 	
-	wire [5:0] pcplus4_if_id, instruction, regWrData_if_id, regWrData_c_if_id;
-		wire [15:0] instruction_c;
-		wire [4:0] rd, rd_c;wire [31:0] regWrData; wire [31:0] regWrData_c;
+	//wire [31:0] pcplus4_if_id;
+	//wire [31:0] instruction;
+	//wire [31:0]regWrData_if_id, regWrData_c_if_id;
+		//wire [15:0] instruction_c;
+		//wire [4:0] rd, rd_c;
+		wire [31:0] regWrData; wire [31:0] regWrData_c;
 		
-		
+		 
 		
 		//_id_ex pipeline
 		wire  [1:0] alusrcB_id_ex;wire  [1:0] aluOp_id_ex;wire  memRd_id_ex;wire  memWr_id_ex;
@@ -1144,7 +1170,7 @@ module main(input clk, input reset);
 		wire  [31:0] reg_rs_c_id_ex;wire  [4:0] rd_id_ex; wire  [4:0] rd_c_id_ex; 
 		wire  [31:0] reg_rt_c_id_ex; wire  [31:0] zeroext22to32_cl_id_ex;wire  [31:0] zeroext5to32_id_ex; wire  [31:0]signext5to32_id_ex;
 		wire  [31:0] signext12to32_id_ex;
-		wire  [5:0] pcplus4_id_ex; wire [31:0] regDataOut_ex_mem_id_ex; 
+		wire  [31:0] pcplus4_id_ex; wire [31:0] regDataOut_ex_mem_id_ex; 
 		wire  [31:0] sext5to32_c_id_ex;
 		wire [31:0] signext6to32_cli_id_ex; wire [31:0] signext12to32_sh; wire [4:0] rd_c_zeroext3to5_id_ex;
 		wire mux2to1_5bits_signal_id_ex;wire regData_id_ex;
@@ -1156,14 +1182,14 @@ module main(input clk, input reset);
 		wire memWr_ex_mem; wire branch_ex_mem; wire regWrite_ex_mem;
 		wire jumpR_ex_mem; wire memRd_c_ex_mem;  wire memWr_c_ex_mem;
 		wire [1:0] regData_c_ex_mem;  wire regWrite_c_ex_mem;  wire [31:0] aluOut_ex_mem;
-		wire [31:0] aluOut_c_ex_mem;  wire [5:0] pcplus4_ex_mem; wire [31:0] reg_rt_c_ex_mem; wire [31:0]  regDataOut_ex_mem;
+		wire [31:0] aluOut_c_ex_mem;  wire [31:0] pcplus4_ex_mem; wire [31:0] reg_rt_c_ex_mem; wire [31:0]  regDataOut_ex_mem;
 		//wire signext6to32_cli_id_ex
-		wire [4:0] rd_c_signext3to5_id_ex; wire [5:0] pcplus4_mem_id;
+		wire [4:0] rd_c_signext3to5_id_ex; wire [31:0] pcplus4_mem_id;
 		
 		//_mem_wb pipeline
 		wire regData_mem_mux;
 		  wire regWrite_mem_id; wire regWrite_c_mem_id;
-						  wire [5:0] pcplus4_mem_if;
+						  wire [31:0] pcplus4_mem_if;
 						   wire [31:0] aluOut_c_mem_id;  wire [31:0] aluOut_mem_id;  wire [31:0] dmOut;
 						   wire [31:0] reg_rt_mem_mux; wire [1:0] regData_c_mem_mux;  wire [4:0] rd_mem_mux;
 						   wire [4:0] rd_c_mem_mux;  wire [31:0] signext6to32_cli_mem_mux; wire [31:0] reg_rt_c_mem_mux;
@@ -1174,19 +1200,25 @@ module main(input clk, input reset);
 	mux2to1_32bits mux2to1_32bits_jumpbranch(aluOut_mem_id,signext12to32_bge , branch_jumpR_signal_mux,
 	branch_jumpR);
 	
-	wire [5:0] pc_adder_out;wire [5:0] pc_in;// wire [5:0] pc_pcmuxout;
+	wire [31:0] pc_adder_out;wire [31:0] pc_in;// wire [5:0] pc_pcmuxout;
 	//mux2to1_32bits mux2to1_32bits_pc_sel(clk,);
-	wire [31:0] pc_in_32bits;
 	//mux2to1_32bits({26'b0,pc_adder_out}, branch_jumpR, pcsrc, pc_in_32bits);
-	mux2to1_6bits mux2to1_6bits_pc(pc_adder_out, branch_jumpR[5:0], pcsrc, pc);
+	//reg [5:0] pc1; //assign pc1 = pc;
+	mux2to1_32bits mux2to1_32bits_pc(pc_adder_out, branch_jumpR, pcsrc, pc_in);
 	//pc = pc_in_32bits[5:0];
-	adder adder_pc(clk, pc_in_32bits[5:0],6'd0,pc_adder_out);
+	/*register32bit( input clk, input reset, input regWrite, input decOut, input regWrite_c, input decOut_c,
+	input [31:0] writeData, input [31:0]
+	writeData_c, output  [31:0] outR );*/
+	register32bit register32bit_pc(clk, reset, 1'b1, 1'b1,1'b0,1'b0, pc_in,32'b0, pc);
+
+	adder adder_pc(pc,32'd4,pc_adder_out);
 	
 	wire [63:0] IR;
-	IM im1(clk, reset, pc, IR);
+	//TODO pc might be 5bits not 6
+	IM im1(clk, reset, pc[5:0], IR);
 	
 	
-		wire [5:0] pc;
+		//wire [5:0] pc;
 		/*input clk, input reset, input [5:0] pcplus4_if_id, input [31:0]instruction, input [15:0] instruction_c,
 						 input [4:0] rd,
 						 input [4:0] rd_c, input [31:0] regWrData, input [31:0] regWrData_c,
@@ -1211,11 +1243,11 @@ module main(input clk, input reset);
 						 output branch, output jumpR, output reg [5:0] pcplus4_id_ex, output reg [31:0] signext12to32_sh,
 						 output reg [4:0] rd_c_zeroext3to5_id_ex, output  reg mux2to1_5bits_signal_id_ex, 
 						 output reg [31:0] signext6to32_c_li,output reg regData_id_ex, output signext12to32_bge,
-						 output greaterThanEqual);
+						 output greaterThan);
 		*/
-		id_pipeline id_pipeline1(clk, reset, pcplus4_if_id, IR[63:32], IR[15:0],
-						  rd,
-						  rd_c,  regWrData, regWrData_c,
+		id_pipeline id_pipeline1(clk, reset, pc_adder_out, IR[63:32], IR[15:0],
+						  rd_mem_mux,
+						  rd_c_mem_mux,  regWrData, regWrData_c,
 						 alusrcB_id_ex, aluOp_id_ex, memRd_id_ex, memWr_id_ex, regWrite_id_ex,
 						 memRd_c_id_ex, memWr_c_id_ex, regData_c_id_ex, regWrite_c_id_ex,
 						 reg_rs_id_ex, reg_rt_id_ex, reg_rs_c_id_ex,
@@ -1226,7 +1258,7 @@ module main(input clk, input reset);
 						 branch_id_pc, jumpR_id_pc, pcplus4_id_ex, signext12to32_sh, rd_c_zeroext3to5_id_ex,
 						 mux2to1_5bits_signal_id_ex,
 						 signext6to32_cli_id_ex,regData_id_ex , signext12to32_bge, 
-						 greaterThanEqual);	
+						 greaterThan);	
 		
 		//reg [31:0] wire_rd_ex_mem, reg [31:0] wire_rd_c_ex_mem,
 		
@@ -1294,7 +1326,7 @@ module main(input clk, input reset);
 						 
 	//mux2to1_32bits(input [31:0] muxIn1, input [31:0] muxIn2, input Sel, output reg [31:0] muxOut);
 	//wire [31:0] regData_muxout;
-	mux2to1_32bits mux2to1_32bits_regDatasel(aluOut_mem_id, {26'b0,pcplus4_mem_if}, regData_mem_mux, regWrData );
+	mux2to1_32bits mux2to1_32bits_regDatasel(aluOut_mem_id, pcplus4_mem_if, regData_mem_mux, regWrData );
 	
 	//wire [31:0] regWrData; wire [31:0] regWrData_c
 	
@@ -1313,16 +1345,18 @@ endmodule
 module testbench;
 	reg clk;
 	reg reset;
-	//reg [5:0] PC;
-	main M(clk,reset);
+
+	//main M(clk,reset,PC,pcsrc);
+	//singleCycle uut (.clk(clk), .reset(reset), .Result(Result));
+	main M(.clk(clk),.reset(reset));
 	
 	always
 		#5 clk=~clk; 
-	
+		
 	initial
 		begin
-			clk=0;reset=1;//PC=6'b0;
-			#5 reset=0;
+			clk=0;reset=1;
+			#15 reset=0;
 			#100 $finish;
 		end
 endmodule
